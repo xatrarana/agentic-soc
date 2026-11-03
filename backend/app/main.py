@@ -11,7 +11,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import actions, alerts, cases, health, incidents, ops, settings
+from app.api import actions, alerts, cases, health, incidents, ops
+from app.api import settings as settings_api
 from app.config import get_settings
 from app.db import session as db_session
 from app.ingestion import scheduler
@@ -22,22 +23,22 @@ log = logging.getLogger("aisoc")
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-    settings = get_settings()
-    db_session.configure(settings.database_url)
+    cfg = get_settings()
+    db_session.configure(cfg.database_url)
     db_session.init_db()
-    log.info("AISOC starting (falcon_mock=%s, db=%s)", settings.falcon_mock, settings.database_url.split("@")[-1])
-    if settings.ingest_enabled:
-        scheduler.start(settings.ingest_interval_seconds)
+    log.info("AISOC starting (falcon_mock=%s, db=%s)", cfg.falcon_mock, cfg.database_url.split("@")[-1])
+    if cfg.ingest_enabled:
+        scheduler.start(cfg.ingest_interval_seconds)
     yield
     scheduler.stop()
 
 
 def create_app() -> FastAPI:
-    settings = get_settings()
+    cfg = get_settings()
     app = FastAPI(title="AISOC", version="0.1.0", lifespan=lifespan)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.cors_origins,
+        allow_origins=cfg.cors_origins,
         allow_methods=["*"],
         allow_headers=["*"],
     )
@@ -47,7 +48,7 @@ def create_app() -> FastAPI:
     app.include_router(actions.router)
     app.include_router(incidents.router)
     app.include_router(ops.router)
-    app.include_router(settings.router)
+    app.include_router(settings_api.router)
     return app
 
 
