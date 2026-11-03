@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Search, Shield, Server, Terminal, Sparkles, Filter } from "lucide-react";
+import { Search, Shield, Server, Terminal, FileSearch, Filter } from "lucide-react";
 import { Alert, ALERT_STATUSES, api } from "@/lib/api";
 import { AlertTriageDrawer } from "./AlertTriageDrawer";
 
@@ -203,7 +203,7 @@ export function AlertsTable({ refreshKey, onRefreshNeeded }: AlertsTableProps) {
                       </div>
                     ) : (
                       <span className="text-slate-500 text-[11px] flex items-center gap-1 font-medium">
-                        <Sparkles className="w-3 h-3 text-slate-600 stroke-[1.75]" />
+                        <FileSearch className="w-3 h-3 text-slate-600 stroke-[1.75]" />
                         <span>Pending Analysis</span>
                       </span>
                     )}

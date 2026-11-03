@@ -1,6 +1,6 @@
 "use client";
 
-import { Shield, RefreshCw, CheckCircle2, AlertTriangle, Radio, SlidersHorizontal, Sparkles } from "lucide-react";
+import { Shield, RefreshCw, CheckCircle2, AlertTriangle, Radio, SlidersHorizontal, FileSearch } from "lucide-react";
 import { Checkpoint, FalconHealth } from "@/lib/api";
 
 interface HeaderProps {
@@ -96,7 +96,7 @@ export function Header({
           disabled={triaging}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-medium transition disabled:opacity-50"
         >
-          <Sparkles className={`w-3.5 h-3.5 text-purple-400 stroke-[1.75] ${triaging ? "animate-spin" : ""}`} />
+          <FileSearch className={`w-3.5 h-3.5 text-cyan-400 stroke-[1.75] ${triaging ? "animate-spin" : ""}`} />
           <span>{triaging ? "Analyzing..." : "Analyze Pending"}</span>
         </button>
 

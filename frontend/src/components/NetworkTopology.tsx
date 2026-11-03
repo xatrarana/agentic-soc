@@ -449,3 +449,4 @@ export function NetworkTopology({ onSelectHost, onContainEndpoint }: NetworkTopo
     </div>
   );
 }
+

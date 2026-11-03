@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import {
   X,
+  Bot,
   Terminal,
   Server,
   User,

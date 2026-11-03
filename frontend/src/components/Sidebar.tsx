@@ -10,7 +10,6 @@ import {
   Zap,
   Plug,
   SlidersHorizontal,
-  Shield,
   PanelLeftClose,
   PanelLeftOpen,
   Radio,
@@ -108,31 +107,29 @@ export function Sidebar({
       <div>
         <div className="p-3.5 border-b border-slate-800/70 flex items-center justify-between">
           {!collapsed ? (
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="p-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
-                <Shield className="w-5 h-5 stroke-[2]" />
-              </div>
+            <div className="flex items-center justify-between w-full">
               <span className="font-bold text-base tracking-tight text-white font-sans truncate">
                 Vektor
               </span>
+              <button
+                onClick={() => setCollapsed(true)}
+                className="p-1 rounded-md text-slate-500 hover:text-slate-200 hover:bg-slate-800 transition"
+                title="Collapse sidebar"
+              >
+                <PanelLeftClose className="w-4 h-4 stroke-[1.75]" />
+              </button>
             </div>
           ) : (
-            <div className="mx-auto p-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
-              <Shield className="w-5 h-5 stroke-[2]" />
+            <div className="w-full flex items-center justify-center">
+              <button
+                onClick={() => setCollapsed(false)}
+                className="p-1.5 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                title="Expand sidebar"
+              >
+                <PanelLeftOpen className="w-4 h-4 stroke-[1.75]" />
+              </button>
             </div>
           )}
-
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="p-1 rounded-md text-slate-500 hover:text-slate-200 hover:bg-slate-850 transition"
-            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            {collapsed ? (
-              <PanelLeftOpen className="w-4 h-4 stroke-[1.75]" />
-            ) : (
-              <PanelLeftClose className="w-4 h-4 stroke-[1.75]" />
-            )}
-          </button>
         </div>
 
         {/* Navigation List */}

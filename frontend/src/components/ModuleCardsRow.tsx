@@ -77,3 +77,4 @@ export function ModuleCardsRow({ onNavigate }: ModuleCardsRowProps) {
     </div>
   );
 }
+

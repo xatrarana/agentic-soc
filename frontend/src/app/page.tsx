@@ -162,8 +162,6 @@ export default function DashboardPage() {
               onRefreshNeeded={refreshAll}
               onSelectAlert={setSelectedAlertId}
               onNavigateToInvestigations={() => setActiveSection("investigations")}
-              onNavigateSection={setActiveSection}
-              onOpenSettings={() => setIsSettingsOpen(true)}
             />
           )}
 
