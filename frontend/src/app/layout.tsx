@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AISOC — AI Security Operations Center & SOAR",
-  description: "Autonomous CrowdStrike Falcon Triage & Response with Claude AI",
+  title: "Vektor — Security Operations & Response",
+  description: "Enterprise CrowdStrike Telemetry, Investigation & Response Workspace",
 };
 
 export default function RootLayout({

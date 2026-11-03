@@ -10,7 +10,7 @@ import {
   AlertTriangle,
   SlidersHorizontal,
   RefreshCw,
-  Sparkles,
+  FileSearch,
   Plug,
   Sliders,
   Crosshair,
@@ -121,8 +121,8 @@ export default function DashboardPage() {
               disabled={triaging}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700/80 text-xs font-medium transition disabled:opacity-50"
             >
-              <Sparkles className={`w-3.5 h-3.5 text-purple-400 stroke-[1.75] ${triaging ? "animate-spin" : ""}`} />
-              <span>{triaging ? "Analyzing..." : "Analyze Pending"}</span>
+              <FileSearch className={`w-3.5 h-3.5 text-cyan-400 stroke-[1.75] ${triaging ? "animate-spin" : ""}`} />
+              <span>{triaging ? "Analyzing..." : "Analyze Detections"}</span>
             </button>
 
             <button
@@ -162,6 +162,8 @@ export default function DashboardPage() {
               onRefreshNeeded={refreshAll}
               onSelectAlert={setSelectedAlertId}
               onNavigateToInvestigations={() => setActiveSection("investigations")}
+              onNavigateSection={setActiveSection}
+              onOpenSettings={() => setIsSettingsOpen(true)}
             />
           )}
 

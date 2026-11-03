@@ -336,3 +336,4 @@ def test_falcon_connection() -> DiagnosticResponse:
         client_id_masked=_mask_id(settings.falcon_client_id),
         scopes=scopes,
     )
+

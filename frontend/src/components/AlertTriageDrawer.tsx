@@ -3,13 +3,12 @@
 import { useEffect, useState } from "react";
 import {
   X,
-  Bot,
   Terminal,
   Server,
   User,
   Hash,
   Clock,
-  Sparkles,
+  FileSearch,
   ExternalLink,
   ChevronDown,
   ChevronUp,
@@ -121,7 +120,7 @@ export function AlertTriageDrawer({ alertId, onClose, onChanged }: DrawerProps) 
         <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-4 shadow-sm">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2 text-slate-200 font-semibold text-xs tracking-wider uppercase">
-              <Sparkles className="w-4 h-4 text-purple-400 stroke-[1.75]" />
+              <FileSearch className="w-4 h-4 text-purple-400 stroke-[1.75]" />
               <span>Threat Investigation Analysis</span>
             </div>
             <button
@@ -129,7 +128,7 @@ export function AlertTriageDrawer({ alertId, onClose, onChanged }: DrawerProps) 
               disabled={triaging}
               className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-medium transition disabled:opacity-50"
             >
-              <Sparkles className={`w-3.5 h-3.5 ${triaging ? "animate-spin" : ""}`} />
+              <FileSearch className={`w-3.5 h-3.5 ${triaging ? "animate-spin" : ""}`} />
               <span>{triaging ? "Analyzing..." : alert.ai_verdict ? "Re-analyze" : "Analyze Threat"}</span>
             </button>
           </div>

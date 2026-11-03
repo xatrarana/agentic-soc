@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Sparkles, ShieldAlert, ArrowRight, RefreshCw, CheckCircle2, AlertTriangle, ExternalLink } from "lucide-react";
+import { ShieldCheck, ShieldAlert, ArrowRight, RefreshCw, CheckCircle2, AlertTriangle, ExternalLink } from "lucide-react";
 import { BriefingResponse, api } from "@/lib/api";
 
 interface BriefingProps {
@@ -47,10 +47,10 @@ export function AiSecurityBriefing({ refreshKey, onSelectAlert }: BriefingProps)
       <div className="flex items-center justify-between pb-3 border-b border-slate-800">
         <div className="flex items-center gap-2.5">
           <div className="p-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
-            <Sparkles className="w-4 h-4 stroke-[1.75]" />
+            <ShieldCheck className="w-4 h-4 stroke-[1.75]" />
           </div>
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-white">AI Security Briefing</h3>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-white">Security Briefing</h3>
             <p className="text-[10px] text-slate-400 font-mono">{briefing.source_summary} · {briefing.time_window}</p>
           </div>
         </div>
