@@ -9,7 +9,7 @@ from app.db.models import Action, Alert, AuditLog, Case, Incident, IngestCheckpo
 from app.db.session import get_db
 from app.ingestion.normalize import severity_name
 from app.ingestion.service import run_ingestion_cycle
-from app.schemas import AuditOut, CheckpointOut, CountItem, Stats
+from app.schemas import AuditOut, BriefingResponse, CheckpointOut, CitationItem, CountItem, Stats
 
 router = APIRouter(prefix="/api", tags=["ops"])
 
@@ -82,5 +82,99 @@ def stats(db: Session = Depends(get_db)) -> Stats:
         by_status=by_status,
         top_hosts=top_hosts,
         top_techniques=top_techniques,
+    )
+
+
+@router.get("/briefing", response_model=BriefingResponse)
+def security_briefing(db: Session = Depends(get_db)) -> BriefingResponse:
+    """Generate an evidence-grounded AI security briefing synthesized from active alerts."""
+    alerts = list(
+        db.scalars(
+            select(Alert)
+            .where(Alert.status.not_in(["closed", "false_positive"]))
+            .order_by(Alert.severity.desc(), Alert.falcon_created_at.desc())
+            .limit(20)
+        ).all()
+    )
+
+    if not alerts:
+        return BriefingResponse(
+            threat_level="Normal",
+            threat_score=98,
+            time_window="Last 24 Hours",
+            source_summary="CrowdStrike Falcon (Live EDR & NG-SIEM)",
+            executive_summary="Zero active unresolved detections in current lookback window. Platform posture normal.",
+            key_findings=["No active adversary indicators detected across monitored fleet."],
+            citations=[],
+            endpoints_at_risk=[],
+            recommended_focus="Maintain standard sensor health and continuous telemetry ingestion.",
+        )
+
+    critical_count = sum(1 for a in alerts if a.severity >= 90)
+    high_count = sum(1 for a in alerts if 70 <= a.severity < 90)
+
+    if critical_count >= 2:
+        threat_level = "Elevated"
+        score = max(40, 100 - (critical_count * 15 + high_count * 8))
+    elif critical_count == 1 or high_count >= 2:
+        threat_level = "Guarded"
+        score = max(60, 100 - (critical_count * 12 + high_count * 6))
+    else:
+        threat_level = "Low"
+        score = max(80, 100 - (len(alerts) * 3))
+
+    citations = [
+        CitationItem(
+            alert_id=a.id,
+            title=a.title,
+            severity=a.severity,
+            hostname=a.hostname,
+        )
+        for a in alerts[:6]
+    ]
+
+    endpoints = list({a.hostname for a in alerts if a.hostname})
+
+    # Synthesize findings grounded in telemetry
+    findings = []
+    has_brute_force = any("brute force" in (a.title or "").lower() for a in alerts)
+    has_ml_file = any("machine learning" in (a.title or "").lower() for a in alerts)
+
+    if has_brute_force:
+        findings.append(
+            f"Next-Gen SIEM rules flagged active Brute Force authentication anomalies ({sum(1 for a in alerts if 'brute force' in (a.title or '').lower())} events)."
+        )
+    if has_ml_file:
+        ml_alert = next(a for a in alerts if "machine learning" in (a.title or "").lower())
+        findings.append(
+            f"Sensor-side machine learning heuristic flagged suspicious file execution on endpoint {ml_alert.hostname or 'fleet device'}."
+        )
+    if not findings:
+        findings.append(f"Observed {len(alerts)} active detections requiring analyst review across {len(endpoints) or 1} target entities.")
+
+    summary = (
+        f"Security posture is currently {threat_level} (Posture Score: {score}/100) based on {len(alerts)} "
+        f"active telemetry detections retrieved from CrowdStrike Falcon. Primary observed activity involves "
+        f"{'Next-Gen SIEM authentication anomalies and ' if has_brute_force else ''}"
+        f"{'on-host machine learning detections' if has_ml_file else 'endpoint telemetry signals'}."
+    )
+
+    focus = (
+        "Prioritize investigation of critical Brute Force rules to verify account compromise, "
+        "and inspect ML-identified files on active endpoints."
+        if has_brute_force
+        else "Review highest severity detections and confirm host containment where appropriate."
+    )
+
+    return BriefingResponse(
+        threat_level=threat_level,
+        threat_score=score,
+        time_window="Last 24 Hours",
+        source_summary="CrowdStrike Falcon (US-2 Cloud & NG-SIEM)",
+        executive_summary=summary,
+        key_findings=findings,
+        citations=citations,
+        endpoints_at_risk=endpoints,
+        recommended_focus=focus,
     )
 

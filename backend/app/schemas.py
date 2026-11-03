@@ -148,6 +148,25 @@ class CaseOut(BaseModel):
     actions: list[ActionOut] = []
 
 
+class CitationItem(BaseModel):
+    alert_id: int
+    title: str
+    severity: int
+    hostname: str | None
+
+
+class BriefingResponse(BaseModel):
+    threat_level: str
+    threat_score: int
+    time_window: str
+    source_summary: str
+    executive_summary: str
+    key_findings: list[str]
+    citations: list[CitationItem]
+    endpoints_at_risk: list[str]
+    recommended_focus: str
+
+
 class Stats(BaseModel):
     total_alerts: int
     open_alerts: int

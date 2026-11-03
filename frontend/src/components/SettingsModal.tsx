@@ -346,3 +346,4 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
     </div>
   );
 }
+

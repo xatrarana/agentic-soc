@@ -136,6 +136,25 @@ export interface DiagnosticResult {
   scopes: ScopeCheckResult[];
 }
 
+export interface CitationItem {
+  alert_id: number;
+  title: string;
+  severity: number;
+  hostname: string | null;
+}
+
+export interface BriefingResponse {
+  threat_level: "Elevated" | "High" | "Critical" | "Guarded" | "Normal" | "Low";
+  threat_score: number;
+  time_window: string;
+  source_summary: string;
+  executive_summary: string;
+  key_findings: string[];
+  citations: CitationItem[];
+  endpoints_at_risk: string[];
+  recommended_focus: string;
+}
+
 export interface FalconSettings {
   configured: boolean;
   mode: string;
@@ -167,6 +186,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  getBriefing: () => request<BriefingResponse>("/api/briefing"),
   getStats: () => request<Stats>("/api/stats"),
   getFalconHealth: () => request<FalconHealth>("/health/falcon"),
   getIngestStatus: () => request<Checkpoint[]>("/api/ingest/status"),
