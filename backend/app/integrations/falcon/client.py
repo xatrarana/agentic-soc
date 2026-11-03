@@ -92,7 +92,7 @@ class FalconClient:
         ids: list[str] = body.get("resources") or []
         results: list[dict[str, Any]] = []
         for chunk in _chunks(ids, INCIDENT_DETAIL_CHUNK):
-            detail = _check(self.incidents.get_incidents(ids=chunk), "get_incidents")
+            detail = _check(self.incidents.get_incidents(body={"ids": chunk}), "get_incidents")
             results.extend(detail.get("resources") or [])
         return results
 
@@ -106,8 +106,8 @@ class FalconClient:
 
     # ----------------------------------------------------------------- intel
     def lookup_indicator(self, value: str, indicator_type: str = "sha256") -> dict[str, Any]:
-        resp = self.intel.get_indicator_entities(parameters={"value": value})
-        body = _check(resp, "get_indicator_entities")
+        resp = self.intel.query_indicator_entities(parameters={"filter": f"indicator:'{value}'", "limit": 1})
+        body = _check(resp, "query_indicator_entities")
         resources = body.get("resources") or []
         if resources:
             return resources[0]
