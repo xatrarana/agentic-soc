@@ -39,3 +39,4 @@ def get_case(case_id: int, db: Session = Depends(get_db)) -> Case:
     if case is None:
         raise HTTPException(404, "Case not found")
     return case
+

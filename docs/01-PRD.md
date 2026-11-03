@@ -93,3 +93,4 @@ Modern enterprise SOCs face severe operational bottlenecks:
 - **Performance**: Ingestion polling interval configured at ≤ 60s. API response time < 100ms for p95 dashboard queries.
 - **Reliability**: Graceful offline degradation. If CrowdStrike or Anthropic APIs rate-limit or fail, the service logs error checkpoints and resumes automatically without crashing.
 - **Auditability**: Complete audit trail conforming to security governance standards (SOC 2, NIST SP 800-61 Rev 2).
+

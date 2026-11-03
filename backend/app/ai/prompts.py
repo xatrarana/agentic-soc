@@ -82,3 +82,4 @@ MITRE Context:
 
 Perform tool queries if you require additional host context or indicator reputation, then return your final JSON triage verdict.
 """
+

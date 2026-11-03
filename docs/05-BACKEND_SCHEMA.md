@@ -223,3 +223,4 @@ Tracks watermark state per telemetry poller.
 | `last_fetched` | `INTEGER` | No | Number of records returned |
 | `last_new` | `INTEGER` | No | Number of novel records created |
 | `last_error` | `TEXT` | Yes | Error message if last poll encountered an exception |
+

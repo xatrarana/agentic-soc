@@ -122,3 +122,4 @@ stateDiagram-v2
 ### Step 4: Resolution & Status Sync
 - The analyst transitions the alert status (`triaged` → `in_progress` → `closed` or `false_positive`).
 - The transition updates local records and optionally writes a comment back to CrowdStrike Falcon console.
+

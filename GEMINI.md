@@ -20,3 +20,4 @@ Whenever a new software engineering or system architecture project is initiated,
 - **No Unplanned Execution**: Implementation starts only after these documents are established and aligned with the user.
 - **Traceability**: Every code change, feature, and database migration must tie back to items defined in these 6 documents.
 - **Continuous Synchronisation**: When specifications or architectural decisions change during development, the corresponding document must be kept up-to-date.
+

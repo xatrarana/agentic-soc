@@ -81,3 +81,4 @@ gantt
 - **Unit & Integration Tests**: All unit tests must pass via `pytest` without requiring external internet or production credentials.
 - **Mock / Production Parity**: Changing `FALCON_MOCK=false` and supplying API keys must work immediately with zero code changes.
 - **Safety Verification**: No destructive Falcon API call can execute without a matching `decided_by` entry and approval event recorded in `audit_log`.
+

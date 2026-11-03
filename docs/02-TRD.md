@@ -136,3 +136,4 @@ The AI agent runs a governed **Tool-Use Loop**:
 To permit safe development without contacting production infrastructure:
 - **`FALCON_MOCK=true`**: MockFalconClient generates realistic multi-stage scenarios (Mimikatz memory dump, PowerShell encoded executions, VSSAdmin shadow copy deletion, Cobalt Strike beacons).
 - Isolated test runner using temporary in-memory/file SQLite databases with zero global state leak.
+

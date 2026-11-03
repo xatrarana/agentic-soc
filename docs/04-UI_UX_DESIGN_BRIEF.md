@@ -90,3 +90,4 @@ For destructive SOAR actions:
 - Buttons:
   - `Reject Action` (prompts for optional rejection comment)
   - `Confirm & Execute Containment` (primary warning red button)
+

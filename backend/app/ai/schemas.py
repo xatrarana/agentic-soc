@@ -60,3 +60,4 @@ class TriageResult(BaseModel):
         default_factory=list,
         description="Specific response actions recommended for containment or remediation.",
     )
+

@@ -108,3 +108,4 @@ def test_soar_human_in_the_loop_action_lifecycle(client):
     # Verify audit trail contains action.executed
     audit_events = client.get("/api/audit").json()
     assert any(e["event"] == "action.executed" for e in audit_events)
+
