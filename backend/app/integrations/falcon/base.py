@@ -37,3 +37,7 @@ class FalconBackend(Protocol):
         """Return raw host (device) details."""
         ...
 
+    def lookup_indicator(self, value: str, indicator_type: str = "sha256") -> dict[str, Any]:
+        """Query Falcon Intel for indicator reputation (hash, domain, or IP)."""
+        ...
+

@@ -4,7 +4,7 @@ from collections.abc import Iterator
 from datetime import datetime
 from typing import Any
 
-from falconpy import OAuth2, Alerts, Hosts, Incidents
+from falconpy import OAuth2, Alerts, Hosts, Incidents, Intel
 
 from app.config import Settings
 from app.integrations.falcon.base import FalconAPIError
@@ -45,6 +45,7 @@ class FalconClient:
         self.alerts = Alerts(auth_object=self._auth)
         self.incidents = Incidents(auth_object=self._auth)
         self.hosts = Hosts(auth_object=self._auth)
+        self.intel = Intel(auth_object=self._auth)
 
     # ------------------------------------------------------------------ auth
     def check_auth(self) -> dict[str, Any]:
@@ -102,4 +103,13 @@ class FalconClient:
             detail = _check(self.hosts.get_device_details(ids=chunk), "get_device_details")
             results.extend(detail.get("resources") or [])
         return results
+
+    # ----------------------------------------------------------------- intel
+    def lookup_indicator(self, value: str, indicator_type: str = "sha256") -> dict[str, Any]:
+        resp = self.intel.get_indicator_entities(parameters={"value": value})
+        body = _check(resp, "get_indicator_entities")
+        resources = body.get("resources") or []
+        if resources:
+            return resources[0]
+        return {"indicator": value, "type": indicator_type, "malicious": False, "verdict": "unknown"}
 

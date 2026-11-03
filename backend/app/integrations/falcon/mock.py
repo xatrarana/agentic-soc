@@ -213,3 +213,49 @@ class MockFalconClient:
             if h["device_id"] in wanted
         ]
 
+    # ----------------------------------------------------------------- intel
+    def lookup_indicator(self, value: str, indicator_type: str = "sha256") -> dict[str, Any]:
+        val = value.lower().strip()
+        # Known malicious hashes / indicators from SCENARIOS
+        known_bad = {
+            "61c0810a23580cf492a6ba4f7654566108331e7a4134c968c2d6a05261b2d8a1": {
+                "indicator": value, "type": "sha256", "malicious": True,
+                "threat_types": ["CredentialStealer", "Hacktool"],
+                "actors": ["FANCY BEAR", "WIZARD SPIDER"],
+                "malware_families": ["Mimikatz"], "confidence": 95
+            },
+            "9785001b0dcf755eddb8af294a373c0b87b2498660f724e76c4d53f9c217c7a3": {
+                "indicator": value, "type": "sha256", "malicious": True,
+                "threat_types": ["Downloader", "Dropper"],
+                "malware_families": ["PowerShell Loader"], "confidence": 85
+            },
+            "c2e6a9a3f2f6b1bd7d3a55e3a1c6f4f4b0f3b1b0e3f1a2b3c4d5e6f708192a3b": {
+                "indicator": value, "type": "sha256", "malicious": True,
+                "threat_types": ["RansomwarePrep"],
+                "malware_families": ["ShadowCopyManipulator"], "confidence": 90
+            },
+            "3f1d5e0c2b7a4c4e9c2f0d6a8b1e3c5d7f9a0b2c4d6e8f0a1b3c5d7e9f1a2b3c": {
+                "indicator": value, "type": "sha256", "malicious": True,
+                "threat_types": ["C2", "RemoteAccessTool"],
+                "malware_families": ["Cobalt Strike Beacon"], "confidence": 99
+            },
+            "198.51.100.77": {
+                "indicator": value, "type": "ip_address", "malicious": True,
+                "threat_types": ["C2"], "actors": ["DEV-0537"], "confidence": 88
+            },
+            "203.0.113.7": {
+                "indicator": value, "type": "ip_address", "malicious": True,
+                "threat_types": ["ReverseShellC2"], "confidence": 80
+            }
+        }
+        if val in known_bad:
+            return known_bad[val]
+        return {
+            "indicator": value,
+            "type": indicator_type,
+            "malicious": False,
+            "verdict": "benign_or_unknown",
+            "threat_types": [],
+            "confidence": 30
+        }
+
