@@ -36,7 +36,7 @@ class FalconClient:
         kwargs: dict[str, Any] = {
             "client_id": settings.falcon_client_id,
             "client_secret": settings.falcon_client_secret.get_secret_value(),
-            "base_url": settings.falcon_cloud,
+            "base_url": settings.falcon_base_url or settings.falcon_cloud,
         }
         if settings.falcon_member_cid:
             kwargs["member_cid"] = settings.falcon_member_cid

@@ -18,13 +18,14 @@ class Settings(BaseSettings):
     app_name: str = "AISOC"
     environment: str = "dev"
     database_url: str = "sqlite:///./aisoc.db"
-    cors_origins: list[str] = ["http://localhost:5173"]
+    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:5173"]
 
     # CrowdStrike Falcon
     falcon_mock: bool = True
     falcon_client_id: str = ""
     falcon_client_secret: SecretStr = SecretStr("")
     falcon_cloud: str = "us1"
+    falcon_base_url: str | None = None
     falcon_member_cid: str | None = None
 
     # Ingestion

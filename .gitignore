@@ -17,6 +17,8 @@ venv/
 # Node
 node_modules/
 dist/
+.next/
+*.tsbuildinfo
 
 # OS / editor
 .DS_Store
