@@ -121,6 +121,30 @@ export interface AuditEntry {
   details: Record<string, unknown>;
 }
 
+export interface ScopeCheckResult {
+  name: string;
+  scope_required: string;
+  status: "ok" | "failed" | "unsupported";
+  message: string;
+}
+
+export interface DiagnosticResult {
+  connected: boolean;
+  mode: string;
+  base_url: string;
+  client_id_masked: string;
+  scopes: ScopeCheckResult[];
+}
+
+export interface FalconSettings {
+  configured: boolean;
+  mode: string;
+  client_id_masked: string;
+  base_url: string;
+  anthropic_configured: boolean;
+  anthropic_model: string;
+}
+
 export const ALERT_STATUSES = [
   "new",
   "triaging",
@@ -187,5 +211,18 @@ export const api = {
     }),
   getIncidents: () => request<{ items: Incident[]; total: number }>("/api/incidents?limit=100"),
   getAuditLog: (limit: number = 50) => request<AuditEntry[]>(`/api/audit?limit=${limit}`),
+  purgeData: () => request<{ status: string; message: string }>("/api/purge-data", { method: "POST" }),
+  getSettings: () => request<FalconSettings>("/api/settings/falcon"),
+  saveSettings: (body: {
+    client_id: string;
+    client_secret: string;
+    base_url: string;
+    falcon_mock: boolean;
+  }) =>
+    request<{ status: string; ok: boolean; mode: string; base_url: string }>("/api/settings/falcon", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+  runDiagnostics: () => request<DiagnosticResult>("/api/settings/falcon/test", { method: "POST" }),
 };
 

@@ -7,6 +7,8 @@ import {
   FolderGit2,
   Activity,
   ScrollText,
+  AlertTriangle,
+  SlidersHorizontal,
 } from "lucide-react";
 import {
   Checkpoint,
@@ -21,6 +23,7 @@ import { ApprovalQueue } from "@/components/ApprovalQueue";
 import { CasesView } from "@/components/CasesView";
 import { IncidentsView } from "@/components/IncidentsView";
 import { AuditLogView } from "@/components/AuditLogView";
+import { SettingsModal } from "@/components/SettingsModal";
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<
@@ -33,6 +36,7 @@ export default function DashboardPage() {
   const [refreshKey, setRefreshKey] = useState<number>(0);
   const [ingesting, setIngesting] = useState(false);
   const [triaging, setTriaging] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const refreshAll = useCallback(() => {
     api.getStats().then(setStats).catch(console.error);
@@ -64,7 +68,7 @@ export default function DashboardPage() {
     setTriaging(true);
     try {
       const res = await api.triagePending(10);
-      alert(`AI Triage completed: ${res.triaged} alerts triaged.`);
+      alert(`Triage completed: ${res.triaged} detections analyzed.`);
       refreshAll();
     } catch (err) {
       alert(`Batch triage failed: ${err}`);
@@ -73,9 +77,11 @@ export default function DashboardPage() {
     }
   };
 
+  const hasConfigWarning = health && !health.ok;
+
   return (
-    <div className="min-h-screen bg-canvas flex flex-col">
-      {/* Top Navigation & Status Bar */}
+    <div className="min-h-screen bg-[#090D16] text-slate-100 flex flex-col font-sans">
+      {/* Top Header */}
       <Header
         health={health}
         checkpoints={checkpoints}
@@ -83,37 +89,55 @@ export default function DashboardPage() {
         ingesting={ingesting}
         onTriagePending={handleBatchTriage}
         triaging={triaging}
+        onOpenSettings={() => setIsSettingsOpen(true)}
       />
 
-      {/* Main Command Workspace */}
+      {/* Disconnection or Permission Warning Banner */}
+      {hasConfigWarning && (
+        <div className="bg-amber-950/40 border-b border-amber-800/60 px-6 py-2.5 flex items-center justify-between text-xs text-amber-200">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 stroke-[2]" />
+            <span>CrowdStrike Falcon connection requires attention or API scope verification.</span>
+          </div>
+          <button
+            onClick={() => setIsSettingsOpen(true)}
+            className="flex items-center gap-1.5 underline font-semibold text-amber-300 hover:text-white"
+          >
+            <span>Open Diagnostic Center</span>
+            <SlidersHorizontal className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
+      {/* Main Workspace */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-6">
         {/* KPI Summary Tiles */}
         <StatsCards stats={stats} />
 
-        {/* Workspace Navigation Tabs */}
-        <div className="flex items-center gap-2 border-b border-border-subtle mb-6 text-xs font-semibold">
+        {/* Tab Navigation */}
+        <div className="flex items-center gap-2 border-b border-slate-800 mb-6 text-xs font-semibold">
           <button
             onClick={() => setActiveTab("alerts")}
-            className={`flex items-center gap-2 pb-3 px-3 transition border-b-2 ${
+            className={`flex items-center gap-2 pb-3 px-3.5 transition border-b-2 ${
               activeTab === "alerts"
                 ? "border-red-500 text-white"
-                : "border-transparent text-gray-400 hover:text-gray-200"
+                : "border-transparent text-slate-400 hover:text-slate-200"
             }`}
           >
-            <Bell className="w-4 h-4" />
-            <span>Alerts & Telemetry</span>
+            <Bell className="w-4 h-4 stroke-[1.75]" />
+            <span>Detections & Telemetry</span>
           </button>
 
           <button
             onClick={() => setActiveTab("approvals")}
-            className={`flex items-center gap-2 pb-3 px-3 transition border-b-2 relative ${
+            className={`flex items-center gap-2 pb-3 px-3.5 transition border-b-2 relative ${
               activeTab === "approvals"
                 ? "border-red-500 text-white"
-                : "border-transparent text-gray-400 hover:text-gray-200"
+                : "border-transparent text-slate-400 hover:text-slate-200"
             }`}
           >
-            <ShieldAlert className="w-4 h-4 text-amber-400" />
-            <span>Action Approvals (SOAR)</span>
+            <ShieldAlert className="w-4 h-4 text-amber-400 stroke-[1.75]" />
+            <span>Authorization Queue</span>
             {pendingActionCount > 0 && (
               <span className="bg-red-600 text-white px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold animate-pulse">
                 {pendingActionCount}
@@ -123,42 +147,42 @@ export default function DashboardPage() {
 
           <button
             onClick={() => setActiveTab("cases")}
-            className={`flex items-center gap-2 pb-3 px-3 transition border-b-2 ${
+            className={`flex items-center gap-2 pb-3 px-3.5 transition border-b-2 ${
               activeTab === "cases"
                 ? "border-red-500 text-white"
-                : "border-transparent text-gray-400 hover:text-gray-200"
+                : "border-transparent text-slate-400 hover:text-slate-200"
             }`}
           >
-            <FolderGit2 className="w-4 h-4" />
-            <span>Investigative Cases</span>
+            <FolderGit2 className="w-4 h-4 stroke-[1.75]" />
+            <span>Incident Cases</span>
           </button>
 
           <button
             onClick={() => setActiveTab("incidents")}
-            className={`flex items-center gap-2 pb-3 px-3 transition border-b-2 ${
+            className={`flex items-center gap-2 pb-3 px-3.5 transition border-b-2 ${
               activeTab === "incidents"
                 ? "border-red-500 text-white"
-                : "border-transparent text-gray-400 hover:text-gray-200"
+                : "border-transparent text-slate-400 hover:text-slate-200"
             }`}
           >
-            <Activity className="w-4 h-4" />
-            <span>Correlated Incidents</span>
+            <Activity className="w-4 h-4 stroke-[1.75]" />
+            <span>Falcon Incidents</span>
           </button>
 
           <button
             onClick={() => setActiveTab("audit")}
-            className={`flex items-center gap-2 pb-3 px-3 transition border-b-2 ${
+            className={`flex items-center gap-2 pb-3 px-3.5 transition border-b-2 ${
               activeTab === "audit"
                 ? "border-red-500 text-white"
-                : "border-transparent text-gray-400 hover:text-gray-200"
+                : "border-transparent text-slate-400 hover:text-slate-200"
             }`}
           >
-            <ScrollText className="w-4 h-4" />
-            <span>Audit Trail</span>
+            <ScrollText className="w-4 h-4 stroke-[1.75]" />
+            <span>Audit Ledger</span>
           </button>
         </div>
 
-        {/* Tab Content Panels */}
+        {/* Tab Views */}
         {activeTab === "alerts" && (
           <AlertsTable refreshKey={refreshKey} onRefreshNeeded={refreshAll} />
         )}
@@ -169,7 +193,13 @@ export default function DashboardPage() {
         {activeTab === "incidents" && <IncidentsView refreshKey={refreshKey} />}
         {activeTab === "audit" && <AuditLogView refreshKey={refreshKey} />}
       </main>
+
+      {/* Settings & Diagnostic Modal */}
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        onSaved={refreshAll}
+      />
     </div>
   );
 }
-
