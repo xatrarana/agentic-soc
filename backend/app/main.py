@@ -11,7 +11,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import alerts, health, incidents, ops
+from app.api import actions, alerts, cases, health, incidents, ops
 from app.config import get_settings
 from app.db import session as db_session
 from app.ingestion import scheduler
@@ -43,6 +43,8 @@ def create_app() -> FastAPI:
     )
     app.include_router(health.router)
     app.include_router(alerts.router)
+    app.include_router(cases.router)
+    app.include_router(actions.router)
     app.include_router(incidents.router)
     app.include_router(ops.router)
     return app

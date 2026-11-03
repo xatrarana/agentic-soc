@@ -107,6 +107,47 @@ class CountItem(BaseModel):
     count: int
 
 
+class ActionOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    case_id: int | None
+    alert_id: int | None
+    action_type: str
+    params: dict[str, Any]
+    risk_tier: str
+    status: str
+    reason: str | None
+    proposed_by: str
+    decided_by: str | None
+    created_at: datetime
+    decided_at: datetime | None
+    executed_at: datetime | None
+    error: str | None
+
+
+class ActionDecision(BaseModel):
+    decision: Literal["approved", "rejected"]
+    decided_by: str = "analyst"
+    comment: str | None = None
+
+
+class CaseOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    title: str
+    status: str
+    severity: int
+    verdict: str | None
+    confidence: float | None
+    summary: str | None
+    created_at: datetime
+    updated_at: datetime
+    alerts: list[AlertOut] = []
+    actions: list[ActionOut] = []
+
+
 class Stats(BaseModel):
     total_alerts: int
     open_alerts: int
