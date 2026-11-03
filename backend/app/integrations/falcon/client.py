@@ -81,14 +81,15 @@ class FalconClient:
 
     # ------------------------------------------------------------- incidents
     def fetch_incidents(self, since: datetime, limit: int) -> list[dict[str, Any]]:
-        body = _check(
-            self.incidents.query_incidents(
-                filter=f"modified_timestamp:>='{to_fql(since)}'",
-                sort="modified_timestamp.asc",
-                limit=min(limit, 500),
-            ),
-            "query_incidents",
+        resp = self.incidents.query_incidents(
+            filter=f"modified_timestamp:>='{to_fql(since)}'",
+            sort="modified_timestamp.asc",
+            limit=min(limit, 500),
         )
+        # CrowdStrike decommissioned the legacy Incidents v1 endpoint on newer tenants (returns 404)
+        if resp.get("status_code") == 404:
+            return []
+        body = _check(resp, "query_incidents")
         ids: list[str] = body.get("resources") or []
         results: list[dict[str, Any]] = []
         for chunk in _chunks(ids, INCIDENT_DETAIL_CHUNK):

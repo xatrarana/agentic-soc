@@ -5,7 +5,7 @@ from fastapi.concurrency import run_in_threadpool
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.db.models import Alert, AuditLog, Incident, IngestCheckpoint
+from app.db.models import Action, Alert, AuditLog, Case, Incident, IngestCheckpoint
 from app.db.session import get_db
 from app.ingestion.normalize import severity_name
 from app.ingestion.service import run_ingestion_cycle
@@ -20,6 +20,18 @@ SEVERITY_ORDER = ["Critical", "High", "Medium", "Low", "Informational"]
 async def run_ingest_now() -> dict[str, Any]:
     """Trigger an immediate ingestion pass."""
     return await run_in_threadpool(run_ingestion_cycle)
+
+
+@router.post("/purge-data")
+def purge_data(db: Session = Depends(get_db)) -> dict[str, str]:
+    """Purge mock/historical data and reset checkpoints for clean live ingestion."""
+    db.query(Action).delete()
+    db.query(Alert).delete()
+    db.query(Case).delete()
+    db.query(Incident).delete()
+    db.query(IngestCheckpoint).delete()
+    db.commit()
+    return {"status": "purged", "message": "All alerts, cases, and checkpoints cleared."}
 
 
 @router.get("/ingest/status", response_model=list[CheckpointOut])
