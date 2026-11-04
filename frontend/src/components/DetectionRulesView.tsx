@@ -245,3 +245,4 @@ export function DetectionRulesView() {
     </div>
   );
 }
+

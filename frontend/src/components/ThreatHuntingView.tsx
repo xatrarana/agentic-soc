@@ -335,3 +335,4 @@ export function ThreatHuntingView({ onSelectAlert, onActionQueued }: ThreatHunti
     </div>
   );
 }
+

@@ -156,7 +156,7 @@ export default function DashboardPage() {
         )}
 
         {/* View Routing */}
-        <main className="p-6 flex-1 max-w-7xl w-full mx-auto space-y-6">
+        <main className="p-5 flex-1 w-full min-w-0 space-y-5">
           {activeSection === "overview" && (
             <SocOverview
               stats={stats}
@@ -164,6 +164,8 @@ export default function DashboardPage() {
               onRefreshNeeded={refreshAll}
               onSelectAlert={setSelectedAlertId}
               onNavigateToInvestigations={() => setActiveSection("investigations")}
+              onNavigateSection={setActiveSection}
+              onOpenSettings={() => setIsSettingsOpen(true)}
             />
           )}
 

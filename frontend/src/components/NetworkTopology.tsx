@@ -225,13 +225,14 @@ export function NetworkTopology({ onSelectHost, onContainEndpoint }: NetworkTopo
         </div>
       </div>
 
-      {/* Interactive Topology Canvas */}
-      <div className="relative p-6 bg-[#080C14] min-h-[320px] flex items-center justify-center overflow-x-auto">
-        <svg
-          viewBox="0 0 780 300"
-          className="w-full max-w-[780px] h-[300px] select-none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
+      {/* Interactive Topology Canvas + Docked Node Inspector */}
+      <div className="bg-[#080C14] flex flex-col xl:flex-row items-stretch">
+        <div className="flex-1 p-4 min-h-[280px] flex items-center justify-center overflow-x-auto">
+          <svg
+            viewBox="0 0 760 280"
+            className="w-full h-[270px] select-none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
           <defs>
             {/* Gradients */}
             <linearGradient id="normalGrad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -353,76 +354,87 @@ export function NetworkTopology({ onSelectHost, onContainEndpoint }: NetworkTopo
               </g>
             );
           })}
-        </svg>
+          </svg>
+        </div>
 
-        {/* Selected Node Telemetry Floating Inspector */}
+        {/* Selected Node Telemetry Docked Inspector (No overlap over SVG nodes) */}
         {selectedNode && (
-          <div className="absolute right-4 top-4 w-72 p-4 rounded-xl bg-[#0B101B]/95 border border-slate-700/80 shadow-2xl backdrop-blur-md space-y-3 z-10 font-sans">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-              <div className="flex items-center gap-2">
-                <span className="p-1 rounded bg-slate-800 text-cyan-400">
-                  {getNodeIcon(selectedNode)}
-                </span>
-                <div>
-                  <h4 className="text-xs font-bold text-white font-mono truncate max-w-[150px]">
-                    {selectedNode.label}
-                  </h4>
-                  <div className="text-[10px] text-slate-400 font-mono">{selectedNode.ip}</div>
+          <div className="xl:w-72 shrink-0 p-4 bg-[#0B101B]/80 border-t xl:border-t-0 xl:border-l border-slate-800/80 flex flex-col justify-between space-y-4 font-sans">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="p-1.5 rounded-lg bg-slate-800 text-cyan-400 shrink-0">
+                    {getNodeIcon(selectedNode)}
+                  </span>
+                  <div className="min-w-0">
+                    <h4 className="text-xs font-bold text-white font-mono truncate">
+                      {selectedNode.label}
+                    </h4>
+                    <div className="text-[10px] text-slate-400 font-mono">{selectedNode.ip}</div>
+                  </div>
                 </div>
-              </div>
-              <span
-                className={`text-[9px] font-mono uppercase font-bold px-1.5 py-0.5 rounded border ${
-                  getNodeColor(selectedNode.status).badge
-                }`}
-              >
-                {getNodeColor(selectedNode.status).label}
-              </span>
-            </div>
-
-            <div className="space-y-1.5 text-[11px] font-mono">
-              <div className="flex justify-between text-slate-400">
-                <span>OS / Platform:</span>
-                <span className="text-slate-200">{selectedNode.os || "Network Appliance"}</span>
-              </div>
-              {selectedNode.agentId && (
-                <div className="flex justify-between text-slate-400">
-                  <span>Falcon Agent AID:</span>
-                  <span className="text-cyan-400 truncate max-w-[130px]">{selectedNode.agentId}</span>
-                </div>
-              )}
-              <div className="flex justify-between text-slate-400">
-                <span>Associated Alerts:</span>
                 <span
-                  className={
-                    (selectedNode.alertCount || 0) > 0 ? "text-red-400 font-bold" : "text-emerald-400"
-                  }
+                  className={`text-[9px] font-mono uppercase font-bold px-1.5 py-0.5 rounded border shrink-0 ${
+                    getNodeColor(selectedNode.status).badge
+                  }`}
                 >
-                  {selectedNode.alertCount || 0} active
+                  {getNodeColor(selectedNode.status).label}
                 </span>
+              </div>
+
+              <div className="space-y-2 text-[11px] font-mono">
+                <div className="flex justify-between text-slate-400">
+                  <span>Role:</span>
+                  <span className="text-slate-200">{selectedNode.sublabel}</span>
+                </div>
+                <div className="flex justify-between text-slate-400">
+                  <span>OS / Platform:</span>
+                  <span className="text-slate-200">{selectedNode.os || "Network Appliance"}</span>
+                </div>
+                {selectedNode.agentId && (
+                  <div className="flex justify-between text-slate-400">
+                    <span>Falcon Agent AID:</span>
+                    <span className="text-cyan-400 truncate max-w-[130px]">{selectedNode.agentId}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-slate-400">
+                  <span>Associated Alerts:</span>
+                  <span
+                    className={
+                      (selectedNode.alertCount || 0) > 0 ? "text-red-400 font-bold" : "text-emerald-400"
+                    }
+                  >
+                    {selectedNode.alertCount || 0} active
+                  </span>
+                </div>
               </div>
             </div>
 
             {/* Quick Action Button */}
             {selectedNode.type === "endpoint" || selectedNode.type === "server" ? (
-              <div className="pt-2 flex gap-2">
+              <div className="pt-2 border-t border-slate-800/80 flex gap-2">
                 <button
                   onClick={() => onSelectHost?.(selectedNode.label)}
-                  className="flex-1 py-1 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] font-semibold transition flex items-center justify-center gap-1"
+                  className="flex-1 py-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-semibold transition flex items-center justify-center gap-1.5"
                 >
-                  <Eye className="w-3 h-3" />
-                  <span>Inspect Detections</span>
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>Inspect</span>
                 </button>
                 {selectedNode.status === "compromised" && (
                   <button
                     onClick={() => onContainEndpoint?.(selectedNode.label)}
-                    className="py-1 px-2 rounded-lg bg-red-600/30 hover:bg-red-600/50 text-red-200 border border-red-500/50 text-[10px] font-bold transition flex items-center gap-1"
+                    className="py-1.5 px-2.5 rounded-lg bg-red-600/30 hover:bg-red-600/50 text-red-200 border border-red-500/50 text-[11px] font-bold transition flex items-center gap-1.5"
                   >
-                    <Lock className="w-3 h-3" />
+                    <Lock className="w-3.5 h-3.5" />
                     <span>Isolate</span>
                   </button>
                 )}
               </div>
-            ) : null}
+            ) : (
+              <div className="text-[10px] font-mono text-slate-500 pt-2 border-t border-slate-800/80">
+                Click any endpoint node on the graph to inspect Falcon sensor telemetry.
+              </div>
+            )}
           </div>
         )}
       </div>

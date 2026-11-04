@@ -236,33 +236,39 @@ export function SocOverview({
         </div>
       </section>
 
-      {/* 3. Centerpiece Command Center Stage: Attack Path & Controls (From Image 1 & 2) */}
-      <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column (4 cols): System Integrity Gauge & Security Controls */}
-        <div className="lg:col-span-4 space-y-6">
+      {/* 3. Centerpiece Command Center Stage: System Integrity (4 cols) + Network Topology (8 cols) */}
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+        <div className="lg:col-span-4 flex flex-col">
           <SystemIntegrityGauge
             score={healthScore}
             onOpenDiagnostics={onOpenSettings}
             falconConnected={true}
           />
-
-          {/* AI Security Briefing & Citations */}
-          <AiSecurityBriefing refreshKey={refreshKey} onSelectAlert={onSelectAlert} />
         </div>
 
-        {/* Right Column (8 cols): Interactive Network Topology & Incident Progression */}
-        <div className="lg:col-span-8 space-y-6">
-          {/* Network Topology & Attack Path Visualizer */}
+        <div className="lg:col-span-8 flex flex-col">
           <NetworkTopology
-            onSelectHost={(hostname) => {
+            onSelectHost={() => {
               if (onNavigateSection) onNavigateSection("investigations");
             }}
-            onContainEndpoint={(hostname) => {
+            onContainEndpoint={() => {
               if (onNavigateSection) onNavigateSection("automation");
             }}
           />
+        </div>
+      </section>
 
-          {/* Incident Progression Lifecycle Timeline */}
+      {/* 4. Balanced 3-Column Operational Row: Security Briefing + Threat Activity + Incident Progression */}
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+        <div className="lg:col-span-4 flex flex-col">
+          <AiSecurityBriefing refreshKey={refreshKey} onSelectAlert={onSelectAlert} />
+        </div>
+
+        <div className="lg:col-span-4 flex flex-col">
+          <ThreatActivityChart stats={stats} />
+        </div>
+
+        <div className="lg:col-span-4 flex flex-col">
           <IncidentProgressionTimeline
             incidentId="INC-2847"
             onAuthorizeAction={() => {
@@ -272,107 +278,36 @@ export function SocOverview({
         </div>
       </section>
 
-      {/* 4. Threat Activity Trend Chart & Telemetry Detections */}
-      <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        <div className="lg:col-span-2 space-y-6">
-          <ThreatActivityChart stats={stats} />
-
-          {/* Telemetry Detections Table */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Activity className="w-4 h-4 text-cyan-400 stroke-[1.75]" />
-                <h3 className="text-xs font-bold uppercase tracking-wider text-white font-mono">
-                  Recent Telemetry Detections
-                </h3>
-              </div>
-              <button
-                onClick={onNavigateToInvestigations}
-                className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1 font-semibold transition"
-              >
-                <span>Full Investigations Workspace</span>
-                <ArrowUpRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            <AlertsTable refreshKey={refreshKey} onRefreshNeeded={onRefreshNeeded} />
+      {/* 5. Full-Width Recent Telemetry Detections (100% Width, Uncluttered) */}
+      <section className="space-y-2.5">
+        <div className="flex items-center justify-between px-1">
+          <div className="flex items-center gap-2">
+            <Activity className="w-4 h-4 text-cyan-400 stroke-[1.75]" />
+            <h3 className="text-xs font-bold uppercase tracking-wider text-white font-mono">
+              Recent Telemetry Detections
+            </h3>
           </div>
+          <button
+            onClick={onNavigateToInvestigations}
+            className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1 font-semibold font-mono transition"
+          >
+            <span>Full Investigations Workspace</span>
+            <ArrowUpRight className="w-3.5 h-3.5" />
+          </button>
         </div>
 
-        {/* Right side: 4 Key Modules Quick Action Cards */}
-        <div className="lg:col-span-1 space-y-4">
-          <div className="p-4 rounded-2xl bg-[#0E1420] border border-slate-800 space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-white font-mono">
-                Command Modules
-              </h4>
-              <span className="text-[10px] text-cyan-400 font-mono">Direct Launch</span>
-            </div>
-            {onNavigateSection && (
-              <div className="space-y-2.5">
-                <button
-                  onClick={() => onNavigateSection("hunting")}
-                  className="w-full text-left p-3 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 transition flex items-center justify-between group"
-                >
-                  <div>
-                    <div className="text-xs font-bold text-white group-hover:text-cyan-400 font-mono">
-                      Threat Intelligence
-                    </div>
-                    <div className="text-[11px] text-slate-400">Context & IOC enrichment</div>
-                  </div>
-                  <ArrowUpRight className="w-4 h-4 text-slate-500 group-hover:text-white" />
-                </button>
-
-                <button
-                  onClick={() => onNavigateSection("investigations")}
-                  className="w-full text-left p-3 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 transition flex items-center justify-between group"
-                >
-                  <div>
-                    <div className="text-xs font-bold text-white group-hover:text-cyan-400 font-mono">
-                      AI Investigation
-                    </div>
-                    <div className="text-[11px] text-slate-400">Automated alert analysis</div>
-                  </div>
-                  <ArrowUpRight className="w-4 h-4 text-slate-500 group-hover:text-white" />
-                </button>
-
-                <button
-                  onClick={() => onNavigateSection("detections")}
-                  className="w-full text-left p-3 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 transition flex items-center justify-between group"
-                >
-                  <div>
-                    <div className="text-xs font-bold text-white group-hover:text-cyan-400 font-mono">
-                      Detection Center
-                    </div>
-                    <div className="text-[11px] text-slate-400">Detection & correlation</div>
-                  </div>
-                  <ArrowUpRight className="w-4 h-4 text-slate-500 group-hover:text-white" />
-                </button>
-
-                <button
-                  onClick={() => onNavigateSection("automation")}
-                  className="w-full text-left p-3 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 transition flex items-center justify-between group"
-                >
-                  <div>
-                    <div className="text-xs font-bold text-white group-hover:text-cyan-400 font-mono">
-                      Response Center
-                    </div>
-                    <div className="text-[11px] text-slate-400">Response workflows & approvals</div>
-                  </div>
-                  <ArrowUpRight className="w-4 h-4 text-slate-500 group-hover:text-white" />
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
+        <AlertsTable refreshKey={refreshKey} onRefreshNeeded={onRefreshNeeded} />
       </section>
 
-      {/* 5. 4 Full Bottom Module Cards matching Image 1 */}
-      {onNavigateSection && (
-        <section className="pt-2">
-          <ModuleCardsRow onNavigate={onNavigateSection} />
-        </section>
-      )}
+      {/* 6. 4 Core SOC Module Cards (100% Width) */}
+      <section>
+        <ModuleCardsRow
+          onNavigate={(s) => {
+            if (onNavigateSection) onNavigateSection(s);
+            else if (s === "investigations") onNavigateToInvestigations();
+          }}
+        />
+      </section>
     </div>
   );
 }

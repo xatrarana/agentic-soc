@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Search, Shield, Server, Terminal, FileSearch, Filter } from "lucide-react";
+import { Search, FileSearch } from "lucide-react";
 import { Alert, ALERT_STATUSES, api } from "@/lib/api";
 import { AlertTriageDrawer } from "./AlertTriageDrawer";
 
@@ -10,7 +10,15 @@ const SEV_BADGES: Record<string, string> = {
   High: "bg-orange-500/20 text-orange-400 border border-orange-500/30",
   Medium: "bg-amber-500/20 text-amber-400 border border-amber-500/30",
   Low: "bg-blue-500/20 text-blue-400 border border-blue-500/30",
-  Informational: "bg-slate-700/30 text-slate-400 border border-slate-700/50",
+  Informational: "bg-slate-800/70 text-slate-300 border border-slate-700",
+};
+
+const SEV_SHORT: Record<string, string> = {
+  Critical: "CRIT",
+  High: "HIGH",
+  Medium: "MED",
+  Low: "LOW",
+  Informational: "INFO",
 };
 
 interface AlertsTableProps {
@@ -51,137 +59,133 @@ export function AlertsTable({ refreshKey, onRefreshNeeded }: AlertsTableProps) {
   };
 
   return (
-    <div className="space-y-4">
-      {/* Search & Filters Bar */}
-      <div className="bg-[#0E1420] border border-slate-800 p-3 rounded-xl flex flex-wrap items-center justify-between gap-3 shadow-md">
-        <div className="flex items-center gap-2 flex-1 min-w-[280px]">
-          <div className="relative w-full">
-            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-2.5 stroke-[1.75]" />
+    <div className="w-full">
+      {/* Unified Compact Telemetry Card */}
+      <div className="bg-[#0E1420] border border-slate-800 rounded-2xl overflow-hidden shadow-lg">
+        {/* Integrated Filter Toolbar */}
+        <div className="px-4 py-2.5 border-b border-slate-800/80 bg-[#0B101B]/70 flex flex-wrap items-center justify-between gap-2.5">
+          <div className="relative flex-1 min-w-[240px] max-w-md">
+            <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 stroke-[1.75]" />
             <input
               type="text"
-              placeholder="Filter by host, filename, hash, technique ID, or command line..."
+              placeholder="Filter by host, filename, hash, technique, or command line..."
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-red-500 transition"
+              className="w-full bg-[#080C14] border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 font-mono transition"
             />
+          </div>
+
+          <div className="flex items-center gap-2 font-mono">
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="bg-[#080C14] border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
+            >
+              <option value="">All Statuses</option>
+              {ALERT_STATUSES.map((s) => (
+                <option key={s} value={s}>
+                  {s.replace("_", " ").toUpperCase()}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={minSev}
+              onChange={(e) => setMinSev(Number(e.target.value))}
+              className="bg-[#080C14] border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
+            >
+              <option value={0}>All Severities</option>
+              <option value={20}>Low+ (20+)</option>
+              <option value={50}>Medium+ (50+)</option>
+              <option value={70}>High+ (70+)</option>
+              <option value={90}>Critical (90+)</option>
+            </select>
+
+            <span className="text-[11px] text-cyan-400 font-semibold px-2.5 py-1 bg-[#080C14] rounded-lg border border-slate-800">
+              {total} signals
+            </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {/* Status Filter */}
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-red-500"
-          >
-            <option value="">All Statuses</option>
-            {ALERT_STATUSES.map((s) => (
-              <option key={s} value={s}>
-                {s.replace("_", " ").toUpperCase()}
-              </option>
-            ))}
-          </select>
-
-          {/* Severity Filter */}
-          <select
-            value={minSev}
-            onChange={(e) => setMinSev(Number(e.target.value))}
-            className="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-red-500"
-          >
-            <option value={0}>All Severities</option>
-            <option value={20}>Low & Above (20+)</option>
-            <option value={50}>Medium & Above (50+)</option>
-            <option value={70}>High & Above (70+)</option>
-            <option value={90}>Critical Only (90+)</option>
-          </select>
-
-          <span className="text-xs text-slate-400 font-mono px-2.5 py-1 bg-slate-950 rounded-lg border border-slate-800">
-            {total} detections
-          </span>
-        </div>
-      </div>
-
-      {/* Detections Data Grid */}
-      <div className="bg-[#0E1420] border border-slate-800 rounded-xl overflow-hidden shadow-lg">
+        {/* High-Density Full-Width Telemetry Grid */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-slate-950/70 border-b border-slate-800 text-slate-400 uppercase font-semibold text-[11px] tracking-wider">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead className="bg-slate-950/60 border-b border-slate-800/80 text-slate-400 uppercase font-mono text-[10px] tracking-wider">
               <tr>
-                <th className="py-3 px-4">Event Time</th>
-                <th className="py-3 px-3">Severity</th>
-                <th className="py-3 px-4">Threat Detection</th>
-                <th className="py-3 px-3">Target Endpoint</th>
-                <th className="py-3 px-3">MITRE ATT&CK</th>
-                <th className="py-3 px-3">Analysis</th>
-                <th className="py-3 px-4">Workflow</th>
+                <th className="py-2.5 px-4 whitespace-nowrap">Event Time</th>
+                <th className="py-2.5 px-3 whitespace-nowrap">Severity</th>
+                <th className="py-2.5 px-4">Threat Detection & Signal</th>
+                <th className="py-2.5 px-3 whitespace-nowrap">Target Entity</th>
+                <th className="py-2.5 px-3 whitespace-nowrap">MITRE ATT&CK</th>
+                <th className="py-2.5 px-3 whitespace-nowrap">Triage Verdict</th>
+                <th className="py-2.5 px-4 text-right whitespace-nowrap">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/80">
+            <tbody className="divide-y divide-slate-800/60">
               {alerts.map((a) => (
                 <tr
                   key={a.id}
                   onClick={() => setSelectedAlertId(a.id)}
-                  className={`hover:bg-slate-850 cursor-pointer transition ${
-                    selectedAlertId === a.id ? "bg-red-950/20" : ""
+                  className={`hover:bg-slate-900/70 cursor-pointer transition ${
+                    selectedAlertId === a.id ? "bg-cyan-950/20" : ""
                   }`}
                 >
                   {/* Timestamp */}
-                  <td className="py-3.5 px-4 text-slate-400 font-mono whitespace-nowrap">
+                  <td className="py-2.5 px-4 text-slate-400 font-mono text-[11px] whitespace-nowrap">
                     {formatTimestamp(a.falcon_created_at)}
                   </td>
 
-                  {/* Severity Badge */}
-                  <td className="py-3.5 px-3 whitespace-nowrap">
+                  {/* Compact Severity Pill */}
+                  <td className="py-2.5 px-3 whitespace-nowrap">
                     <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
                         SEV_BADGES[a.severity_name] ?? "bg-slate-800 text-slate-200"
                       }`}
                     >
-                      {a.severity} {a.severity_name}
+                      <span>{SEV_SHORT[a.severity_name] ?? a.severity_name}</span>
+                      <span className="opacity-75">· {a.severity}</span>
                     </span>
                   </td>
 
-                  {/* Detection Title & Artifact */}
-                  <td className="py-3.5 px-4 max-w-md">
-                    <div className="font-semibold text-slate-100 leading-snug">{a.title}</div>
-                    {a.filename ? (
-                      <div className="text-[11px] text-slate-400 font-mono truncate mt-0.5">
-                        {a.filename}
-                      </div>
-                    ) : a.cmdline ? (
-                      <div className="text-[11px] text-slate-400 font-mono truncate mt-0.5">
-                        {a.cmdline}
-                      </div>
-                    ) : null}
+                  {/* Detection Title & Inline Artifact */}
+                  <td className="py-2.5 px-4">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-semibold text-slate-100">{a.title}</span>
+                      {(a.filename || a.cmdline) && (
+                        <code className="text-[11px] text-cyan-300/90 font-mono bg-slate-950/80 px-1.5 py-0.2 rounded border border-slate-800 truncate max-w-xs">
+                          {a.filename || a.cmdline}
+                        </code>
+                      )}
+                    </div>
                   </td>
 
                   {/* Host */}
-                  <td className="py-3.5 px-3 whitespace-nowrap">
-                    <div className="font-mono text-slate-200 font-medium">
+                  <td className="py-2.5 px-3 whitespace-nowrap font-mono">
+                    <span className="text-slate-200 font-semibold text-[11px]">
                       {a.hostname || (a.product === "ngsiem" ? "Next-Gen SIEM" : "Cloud Identity")}
-                    </div>
-                    <div className="text-[10px] text-slate-500 font-mono">
-                      {a.platform || a.product || "Falcon Telemetry"}
-                    </div>
+                    </span>
+                    <span className="text-[10px] text-slate-500 ml-1.5">
+                      ({a.platform || a.product || "EDR"})
+                    </span>
                   </td>
 
                   {/* MITRE */}
-                  <td className="py-3.5 px-3 whitespace-nowrap">
+                  <td className="py-2.5 px-3 whitespace-nowrap">
                     {a.technique_id ? (
-                      <span className="bg-slate-950 text-cyan-300 px-2 py-0.5 rounded border border-cyan-900/50 font-mono text-[11px]">
+                      <span className="bg-slate-950 text-purple-300 px-2 py-0.5 rounded border border-purple-900/50 font-mono text-[10px]">
                         {a.technique_id}
                       </span>
                     ) : (
-                      <span className="text-slate-600 font-mono text-[11px]">General Alert</span>
+                      <span className="text-slate-500 font-mono text-[10px]">SIEM / Heuristic</span>
                     )}
                   </td>
 
                   {/* Analysis Result */}
-                  <td className="py-3.5 px-3 whitespace-nowrap">
+                  <td className="py-2.5 px-3 whitespace-nowrap font-mono">
                     {a.ai_verdict ? (
                       <div className="flex items-center gap-1.5">
                         <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                          className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
                             a.ai_verdict === "true_positive"
                               ? "bg-red-500/20 text-red-400 border border-red-500/30"
                               : a.ai_verdict === "false_positive"
@@ -190,29 +194,29 @@ export function AlertsTable({ refreshKey, onRefreshNeeded }: AlertsTableProps) {
                           }`}
                         >
                           {a.ai_verdict === "true_positive"
-                            ? "Malicious"
+                            ? "Threat"
                             : a.ai_verdict === "false_positive"
                             ? "Benign"
                             : "Review"}
                         </span>
                         {a.ai_confidence && (
-                          <span className="text-[10px] text-slate-400 font-mono">
+                          <span className="text-[10px] text-slate-400">
                             {Math.round(a.ai_confidence * 100)}%
                           </span>
                         )}
                       </div>
                     ) : (
-                      <span className="text-slate-500 text-[11px] flex items-center gap-1 font-medium">
+                      <span className="text-slate-500 text-[11px] inline-flex items-center gap-1">
                         <FileSearch className="w-3 h-3 text-slate-600 stroke-[1.75]" />
-                        <span>Pending Analysis</span>
+                        <span>Untriaged</span>
                       </span>
                     )}
                   </td>
 
                   {/* Workflow Status */}
-                  <td className="py-3.5 px-4 whitespace-nowrap">
+                  <td className="py-2.5 px-4 text-right whitespace-nowrap font-mono">
                     <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider ${
+                      className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase ${
                         a.status === "closed"
                           ? "bg-slate-800 text-slate-400"
                           : a.status === "false_positive"
@@ -232,8 +236,8 @@ export function AlertsTable({ refreshKey, onRefreshNeeded }: AlertsTableProps) {
 
               {alerts.length === 0 && !loading && (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-400">
-                    No detections match current criteria. Click &quot;Sync Detections&quot; to fetch live telemetry.
+                  <td colSpan={7} className="py-8 text-center text-slate-400 font-mono text-xs">
+                    No detections match current criteria. Click &quot;Sync Telemetry&quot; to fetch live events.
                   </td>
                 </tr>
               )}
