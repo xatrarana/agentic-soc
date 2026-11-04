@@ -193,20 +193,16 @@ def run_threat_hunt(
             )
 
     alerts = list(db.scalars(stmt.limit(50)).all())
-    # If specific filter matched 0 in small live DB, return all live telemetry so analyst sees grounded tenant context
-    if not alerts:
-        alerts = list(db.scalars(select(Alert).order_by(Alert.falcon_created_at.desc()).limit(25)).all())
-        explanation += " (No exact substring match; displaying all active tenant telemetry records for inspection.)"
 
     rows = [
         HuntResultRow(
             id=a.id,
             timestamp=(a.falcon_created_at or a.ingested_at).isoformat(),
-            hostname=a.hostname or (a.product.upper() if a.product else "NG-SIEM"),
-            user_name=a.user_name or "System",
+            hostname=a.hostname or (a.product.upper() if a.product else "Unassigned"),
+            user_name=a.user_name or "Unspecified",
             title=a.title,
             severity=a.severity,
-            technique=f"{a.technique_id or ''} {a.technique or 'Telemetry Signal'}".strip(),
+            technique=f"{a.technique_id or ''} {a.technique or ''}".strip() or "Unclassified",
             indicator=a.sha256 or a.cmdline or a.local_ip or a.falcon_id,
         )
         for a in alerts
@@ -288,80 +284,35 @@ class RuleTestRequest(BaseModel):
 
 @router.get("/detections/rules", response_model=list[DetectionRuleItem])
 def list_detection_rules(db: Session = Depends(get_db)) -> list[DetectionRuleItem]:
-    alerts = list(db.scalars(select(Alert)).all())
+    alerts = list(db.scalars(select(Alert).order_by(Alert.severity.desc())).all())
+    if not alerts:
+        return []
 
-    brute_hits = sum(1 for a in alerts if "brute" in (a.title or "").lower() or a.product == "ngsiem")
-    ml_hits = sum(1 for a in alerts if "machine learning" in (a.title or "").lower() or a.sha256)
-    ps_hits = sum(1 for a in alerts if "powershell" in (a.cmdline or "").lower())
-    cred_hits = sum(1 for a in alerts if "credential" in (a.tactic or "").lower())
+    grouped: dict[str, list[Alert]] = {}
+    for a in alerts:
+        key = a.title or "Unnamed Detection"
+        grouped.setdefault(key, []).append(a)
 
-    return [
-        DetectionRuleItem(
-            id="RULE-NGSIEM-001",
-            name="Brute Force Authentication Anomaly (Next-Gen SIEM)",
-            source="CrowdStrike Next-Gen SIEM",
-            mitre_tactic="Credential Access",
-            mitre_technique_id="T1110.001",
-            mitre_technique="Brute Force: Password Guessing",
-            severity=90,
-            status="Enabled",
-            query_logic="#event_simpleName=UserLogonFailed* | groupBy([TargetUserName, RemoteAddressIP4], function=count()) | filter count >= 10",
-            hit_count=brute_hits,
-            false_positive_rate="Low (4%)",
-        ),
-        DetectionRuleItem(
-            id="RULE-EDR-002",
-            name="Sensor-Based Machine Learning Malicious File Prevention",
-            source="CrowdStrike Falcon Sensor ML",
-            mitre_tactic="Execution",
-            mitre_technique_id="T1204.002",
-            mitre_technique="User Execution: Malicious File",
-            severity=75,
-            status="Enabled",
-            query_logic="#event_simpleName=PeFileWritten OR #event_simpleName=ProcessRollup2 | SensorMLConfidence >= High",
-            hit_count=ml_hits,
-            false_positive_rate="Very Low (2%)",
-        ),
-        DetectionRuleItem(
-            id="RULE-EDR-003",
-            name="Obfuscated or Encoded PowerShell Execution",
-            source="Custom IOA Rule Group",
-            mitre_tactic="Execution",
-            mitre_technique_id="T1059.001",
-            mitre_technique="Command and Scripting Interpreter: PowerShell",
-            severity=85,
-            status="Enabled",
-            query_logic="ImageFileName=/powershell\\.exe/i AND CommandLine=/(-enc|-encodedcommand|-w hidden|downloadstring)/i",
-            hit_count=ps_hits,
-            false_positive_rate="Low (6%)",
-        ),
-        DetectionRuleItem(
-            id="RULE-EDR-004",
-            name="LSASS Process Memory Credential Dumping",
-            source="CrowdStrike Falcon IOA",
-            mitre_tactic="Credential Access",
-            mitre_technique_id="T1003.001",
-            mitre_technique="OS Credential Dumping: LSASS Memory",
-            severity=95,
-            status="Enabled",
-            query_logic="TargetImageFileName=/lsass\\.exe/i AND GrantedAccess IN (0x1010, 0x1410, 0x1438, 0x1fffff)",
-            hit_count=cred_hits,
-            false_positive_rate="Minimal (<1%)",
-        ),
-        DetectionRuleItem(
-            id="RULE-EDR-005",
-            name="Volume Shadow Copy Deletion (Ransomware Precursor)",
-            source="CrowdStrike Falcon Prevention",
-            mitre_tactic="Impact",
-            mitre_technique_id="T1490",
-            mitre_technique="Inhibit System Recovery",
-            severity=98,
-            status="Enabled",
-            query_logic="CommandLine=/(vssadmin.*delete.*shadows|wmic.*shadowcopy.*delete|bcdedit.*recoveryenabled.*no)/i",
-            hit_count=0,
-            false_positive_rate="Minimal (<1%)",
-        ),
-    ]
+    rules: list[DetectionRuleItem] = []
+    for idx, (title, group) in enumerate(grouped.items(), start=1):
+        sample = group[0]
+        fp_count = sum(1 for x in group if x.status == "false_positive")
+        rules.append(
+            DetectionRuleItem(
+                id=f"RULE-{idx:03d}",
+                name=title,
+                source=sample.product or "CrowdStrike Falcon",
+                mitre_tactic=sample.tactic or "Unclassified",
+                mitre_technique_id=sample.technique_id or "N/A",
+                mitre_technique=sample.technique or title,
+                severity=max(x.severity for x in group),
+                status="Active",
+                query_logic=f'DetectName="{title}"' + (f' AND TechniqueId="{sample.technique_id}"' if sample.technique_id else ""),
+                hit_count=len(group),
+                false_positive_rate=f"{fp_count}/{len(group)} FP",
+            )
+        )
+    return rules
 
 
 @router.post("/detections/test")

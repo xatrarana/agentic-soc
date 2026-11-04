@@ -144,7 +144,7 @@ export interface CitationItem {
 }
 
 export interface BriefingResponse {
-  threat_level: "Elevated" | "High" | "Critical" | "Guarded" | "Normal" | "Low";
+  threat_level: "Elevated" | "High" | "Critical" | "Guarded" | "Normal" | "Low" | "No Data" | string;
   threat_score: number;
   time_window: string;
   source_summary: string;

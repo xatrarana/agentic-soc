@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ["http://localhost:3000", "http://localhost:5173"]
 
     # CrowdStrike Falcon
-    falcon_mock: bool = True
+    falcon_mock: bool = False
     falcon_client_id: str = ""
     falcon_client_secret: SecretStr = SecretStr("")
     falcon_cloud: str = "us1"
