@@ -164,6 +164,52 @@ export interface FalconSettings {
   anthropic_model: string;
 }
 
+export interface AlertChatResponse {
+  answer: string;
+  observed_facts: string[];
+  inferred_analysis: string;
+  recommended_next_step: string;
+}
+
+export interface HuntResultRow {
+  id: number;
+  timestamp: string;
+  hostname: string;
+  user_name: string;
+  title: string;
+  severity: number;
+  technique: string;
+  indicator: string;
+}
+
+export interface HuntQueryResponse {
+  generated_fql: string;
+  explanation: string;
+  total_matches: number;
+  results: HuntResultRow[];
+}
+
+export interface DetectionRuleItem {
+  id: string;
+  name: string;
+  source: string;
+  mitre_tactic: string;
+  mitre_technique_id: string;
+  mitre_technique: string;
+  severity: number;
+  status: string;
+  query_logic: string;
+  hit_count: number;
+  false_positive_rate: string;
+}
+
+export interface RuleTestResponse {
+  evaluated_events: number;
+  matched_count: number;
+  matches: { id: number; title: string; hostname: string; severity: number }[];
+  assessment: string;
+}
+
 export const ALERT_STATUSES = [
   "new",
   "triaging",
@@ -244,5 +290,31 @@ export const api = {
       body: JSON.stringify(body),
     }),
   runDiagnostics: () => request<DiagnosticResult>("/api/settings/falcon/test", { method: "POST" }),
+  chatAlert: (alertId: number, question: string) =>
+    request<AlertChatResponse>(`/api/alerts/${alertId}/chat`, {
+      method: "POST",
+      body: JSON.stringify({ question }),
+    }),
+  runThreatHunt: (prompt: string, time_range: string = "24h") =>
+    request<HuntQueryResponse>("/api/hunting/query", {
+      method: "POST",
+      body: JSON.stringify({ prompt, time_range }),
+    }),
+  pushCustomIoc: (indicator_type: string, value: string, reason?: string) =>
+    request<{ status: string; action_id: number; message: string }>("/api/hunting/ioc", {
+      method: "POST",
+      body: JSON.stringify({ indicator_type, value, reason }),
+    }),
+  getDetectionRules: () => request<DetectionRuleItem[]>("/api/detections/rules"),
+  testDetectionRule: (query_logic: string) =>
+    request<RuleTestResponse>("/api/detections/test", {
+      method: "POST",
+      body: JSON.stringify({ query_logic }),
+    }),
+  addCaseNote: (caseId: number, author: string, note: string, status?: string) =>
+    request<{ status: string; case_id: number; summary: string }>(`/api/cases/${caseId}/notes`, {
+      method: "POST",
+      body: JSON.stringify({ author, note, status }),
+    }),
 };
 

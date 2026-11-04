@@ -55,3 +55,35 @@ def test_stats(client):
     assert stats["total_alerts"] == sum(s["count"] for s in stats["by_severity"])
     assert [s["key"] for s in stats["by_severity"]] == ["Critical", "High", "Medium", "Low", "Informational"]
 
+
+def test_workspace_hunting_detections_and_chat(client):
+    client.post("/api/ingest/run")
+    alert = client.get("/api/alerts", params={"limit": 1}).json()["items"][0]
+
+    # Grounded Alert Chat Q&A
+    chat = client.post(f"/api/alerts/{alert['id']}/chat", json={"question": "Should we isolate this host?"})
+    assert chat.status_code == 200
+    assert "[Observed]" in chat.json()["answer"]
+
+    # Threat Hunting NL-to-FQL
+    hunt = client.post("/api/hunting/query", json={"prompt": "Find encoded powershell executions", "time_range": "24h"})
+    assert hunt.status_code == 200
+    assert "generated_fql" in hunt.json()
+    assert hunt.json()["total_matches"] >= 1
+
+    # Custom IOC Prevention Queue
+    ioc = client.post(
+        "/api/hunting/ioc",
+        json={"indicator_type": "sha256", "value": "a" * 64, "reason": "Confirmed malware hash"},
+    )
+    assert ioc.status_code == 200
+    assert ioc.json()["status"] == "queued"
+
+    # Detection Engineering Rules & Dry-Run
+    rules = client.get("/api/detections/rules").json()
+    assert len(rules) >= 5
+    dry_run = client.post("/api/detections/test", json={"query_logic": "powershell"})
+    assert dry_run.status_code == 200
+    assert "evaluated_events" in dry_run.json()
+
+

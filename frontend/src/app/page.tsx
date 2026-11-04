@@ -30,6 +30,8 @@ import { CasesView } from "@/components/CasesView";
 import { IncidentsView } from "@/components/IncidentsView";
 import { AuditLogView } from "@/components/AuditLogView";
 import { SettingsModal } from "@/components/SettingsModal";
+import { ThreatHuntingView } from "@/components/ThreatHuntingView";
+import { DetectionRulesView } from "@/components/DetectionRulesView";
 
 export default function DashboardPage() {
   const [activeSection, setActiveSection] = useState<NavSection>("overview");
@@ -182,30 +184,15 @@ export default function DashboardPage() {
           )}
 
           {activeSection === "hunting" && (
-            <div className="p-8 rounded-2xl bg-[#0E1420] border border-slate-800 text-center space-y-3">
-              <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center mx-auto">
-                <Crosshair className="w-5 h-5 stroke-[1.75]" />
-              </div>
-              <h3 className="text-sm font-bold text-white uppercase font-mono">Threat Hunting Workspace (Stage 3)</h3>
-              <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
-                Natural-language query generation (NL-to-CQL) and deep Falcon LogScale event searching will be wired in Stage 3.
-              </p>
-            </div>
+            <ThreatHuntingView
+              onSelectAlert={setSelectedAlertId}
+              onActionQueued={refreshAll}
+            />
           )}
 
           {activeSection === "incidents" && <CasesView refreshKey={refreshKey} />}
 
-          {activeSection === "detections" && (
-            <div className="p-8 rounded-2xl bg-[#0E1420] border border-slate-800 text-center space-y-3">
-              <div className="w-10 h-10 rounded-2xl bg-purple-500/10 border border-purple-500/30 text-purple-400 flex items-center justify-center mx-auto">
-                <Sliders className="w-5 h-5 stroke-[1.75]" />
-              </div>
-              <h3 className="text-sm font-bold text-white uppercase font-mono">Detection Engineering (Stage 4)</h3>
-              <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
-                Rule drafting, MITRE technique test harness, and false-positive evaluation workflows will activate in Stage 4.
-              </p>
-            </div>
-          )}
+          {activeSection === "detections" && <DetectionRulesView />}
 
           {activeSection === "automation" && (
             <ApprovalQueue refreshKey={refreshKey} onActionDecided={refreshAll} />

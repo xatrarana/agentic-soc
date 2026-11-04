@@ -49,8 +49,8 @@ def test_soar_human_in_the_loop_action_lifecycle(client):
     alert = alerts[0]
     client.post(f"/api/alerts/{alert['id']}/triage")
 
-    # Fetch actions
-    actions = client.get("/api/actions").json()
+    # Fetch pending actions
+    actions = client.get("/api/actions?status=pending_approval").json()
 
     if not actions:
         # If no destructive action was proposed by heuristic for this alert, create one to test the approval queue
