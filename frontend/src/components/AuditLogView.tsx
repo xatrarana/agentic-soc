@@ -19,52 +19,52 @@ export function AuditLogView({ refreshKey }: { refreshKey: number }) {
 
   return (
     <div className="space-y-4">
-      <div className="bg-[#0E1420] border border-slate-800 p-3 rounded-xl flex items-center justify-between shadow-md">
+      <div className="bg-zinc-900 border border-zinc-800 p-4 rounded-lg flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <ScrollText className="w-5 h-5 text-emerald-400 stroke-[1.75]" />
-          <h2 className="text-sm font-bold text-white tracking-wide">
-            Immutable Audit & Compliance Ledger
+          <ScrollText className="w-4 h-4 text-zinc-400" />
+          <h2 className="text-sm font-semibold text-zinc-100">
+            Audit Log
           </h2>
         </div>
-        <span className="text-xs text-slate-400 font-mono">{logs.length} logged events</span>
+        <span className="text-xs text-zinc-400 font-mono">{logs.length} events</span>
       </div>
 
-      <div className="bg-[#0E1420] border border-slate-800 rounded-xl overflow-hidden shadow-lg">
+      <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-950/70 border-b border-slate-800 text-slate-400 uppercase font-semibold text-[11px] tracking-wider">
+            <thead className="bg-zinc-950 border-b border-zinc-800 text-zinc-400 font-medium text-[11px]">
               <tr>
-                <th className="py-3 px-4">Timestamp (UTC)</th>
-                <th className="py-3 px-3">Actor</th>
-                <th className="py-3 px-4">Event Operation</th>
-                <th className="py-3 px-3">Target Entity</th>
-                <th className="py-3 px-4">Payload Summary</th>
+                <th className="py-2.5 px-4">Timestamp</th>
+                <th className="py-2.5 px-3">Actor</th>
+                <th className="py-2.5 px-4">Event</th>
+                <th className="py-2.5 px-3">Target</th>
+                <th className="py-2.5 px-4">Details</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/80">
+            <tbody className="divide-y divide-zinc-800/80">
               {logs.map((l) => (
-                <tr key={l.id} className="hover:bg-slate-850 transition">
-                  <td className="py-3.5 px-4 text-slate-400 font-mono whitespace-nowrap">
+                <tr key={l.id} className="hover:bg-zinc-800/40 transition">
+                  <td className="py-2.5 px-4 text-zinc-400 font-mono whitespace-nowrap">
                     {new Date(l.ts).toLocaleString()}
                   </td>
-                  <td className="py-3.5 px-3 font-mono font-medium text-purple-300 whitespace-nowrap">
+                  <td className="py-2.5 px-3 font-mono text-zinc-200 whitespace-nowrap">
                     {l.actor}
                   </td>
-                  <td className="py-3.5 px-4 whitespace-nowrap font-mono text-cyan-300">
+                  <td className="py-2.5 px-4 whitespace-nowrap font-mono text-zinc-300">
                     {l.event}
                   </td>
-                  <td className="py-3.5 px-3 font-mono text-slate-400 whitespace-nowrap">
+                  <td className="py-2.5 px-3 font-mono text-zinc-400 whitespace-nowrap">
                     {l.target_type ? `${l.target_type} #${l.target_id || ""}` : "System"}
                   </td>
-                  <td className="py-3.5 px-4 text-slate-300 font-mono text-[11px] break-all max-w-md">
+                  <td className="py-2.5 px-4 text-zinc-400 font-mono text-[11px] break-all max-w-md">
                     {JSON.stringify(l.details)}
                   </td>
                 </tr>
               ))}
               {logs.length === 0 && !loading && (
                 <tr>
-                  <td colSpan={5} className="py-12 text-center text-slate-400">
-                    Audit ledger is currently empty.
+                  <td colSpan={5} className="py-8 text-center text-zinc-500">
+                    No audit log entries recorded.
                   </td>
                 </tr>
               )}

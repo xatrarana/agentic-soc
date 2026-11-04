@@ -11,35 +11,27 @@ export function ModuleCardsRow({ onNavigate }: ModuleCardsRowProps) {
   const modules = [
     {
       id: "hunting" as NavSection,
-      title: "Threat Intelligence",
-      description: "Threat actor context, IOC enrichment, and Falcon intelligence indicators.",
+      title: "Threat Hunting",
+      description: "Query telemetry and stage custom IOC prevention rules.",
       icon: Shield,
-      color: "text-blue-400 bg-blue-500/10 border-blue-500/20 group-hover:border-blue-500/50",
-      accent: "group-hover:text-blue-300",
     },
     {
       id: "investigations" as NavSection,
-      title: "AI Investigation",
-      description: "Grounded telemetry analysis, process execution lineage, and triage evidence.",
+      title: "Investigations",
+      description: "Inspect alert telemetry, process lineage, and triage findings.",
       icon: FileSearch,
-      color: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20 group-hover:border-cyan-500/50",
-      accent: "group-hover:text-cyan-300",
     },
     {
       id: "detections" as NavSection,
-      title: "Detection Center",
-      description: "Next-Gen SIEM & EDR correlation rules mapped to MITRE ATT&CK techniques.",
+      title: "Detection Rules",
+      description: "View active detection rules derived from ingested alerts.",
       icon: Sliders,
-      color: "text-purple-400 bg-purple-500/10 border-purple-500/20 group-hover:border-purple-500/50",
-      accent: "group-hover:text-purple-300",
     },
     {
       id: "automation" as NavSection,
-      title: "Response Center",
-      description: "Human-in-the-loop playbooks, host containment gates, and audit ledger.",
+      title: "Response Approvals",
+      description: "Review and authorize pending containment and IOC actions.",
       icon: Zap,
-      color: "text-amber-400 bg-amber-500/10 border-amber-500/20 group-hover:border-amber-500/50",
-      accent: "group-hover:text-amber-300",
     },
   ];
 
@@ -51,25 +43,21 @@ export function ModuleCardsRow({ onNavigate }: ModuleCardsRowProps) {
           <button
             key={m.id}
             onClick={() => onNavigate(m.id)}
-            className="group text-left p-4 rounded-2xl bg-[#0E1420] border border-slate-800 hover:border-slate-700 hover:bg-[#121927] transition-all duration-200 shadow-md flex flex-col justify-between"
+            className="group text-left p-4 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800/60 transition flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center justify-between">
-                <div className={`p-2.5 rounded-xl border transition ${m.color}`}>
-                  <Icon className="w-5 h-5 stroke-[1.75]" />
+                <div className="p-2 rounded-md bg-zinc-800 text-zinc-300 border border-zinc-700">
+                  <Icon className="w-4 h-4" />
                 </div>
-                <ArrowUpRight className="w-4 h-4 text-slate-500 group-hover:text-white transition transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                <ArrowUpRight className="w-4 h-4 text-zinc-500 group-hover:text-zinc-200 transition" />
               </div>
-              <h4 className={`text-sm font-bold text-white mt-3 font-mono ${m.accent}`}>
+              <h4 className="text-sm font-semibold text-zinc-100 mt-3">
                 {m.title}
               </h4>
-              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+              <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
                 {m.description}
               </p>
-            </div>
-            <div className="mt-3 pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-mono text-slate-400">
-              <span className="text-slate-400">Open Module</span>
-              <span className="text-cyan-400 font-semibold group-hover:underline">Launch →</span>
             </div>
           </button>
         );
@@ -77,4 +65,3 @@ export function ModuleCardsRow({ onNavigate }: ModuleCardsRowProps) {
     </div>
   );
 }
-

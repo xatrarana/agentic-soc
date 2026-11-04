@@ -88,8 +88,8 @@ export default function DashboardPage() {
   const hasConfigWarning = health && !health.ok;
 
   return (
-    <div className="min-h-screen bg-[#080C14] text-slate-100 flex font-sans antialiased selection:bg-cyan-500 selection:text-black">
-      {/* 1. Persistent Left Navigation Rail (8 Target Modules) */}
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex font-sans antialiased">
+      {/* 1. Left Navigation Rail */}
       <Sidebar
         activeSection={activeSection}
         onSelectSection={setActiveSection}
@@ -102,52 +102,51 @@ export default function DashboardPage() {
       {/* 2. Main Content Stage */}
       <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         {/* Top Operational Header */}
-        <header className="border-b border-slate-800/80 bg-[#0B101B] px-6 py-3.5 sticky top-0 z-30 flex items-center justify-between shadow-md">
+        <header className="border-b border-zinc-800 bg-zinc-900 px-6 py-3 sticky top-0 z-30 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-sm font-bold tracking-tight text-white uppercase font-mono">
-              {activeSection === "overview" && "SOC Command Center — Live Overview"}
-              {activeSection === "investigations" && "AI Investigations & Evidence Triage"}
-              {activeSection === "hunting" && "Threat Hunting & Query Workspace"}
-              {activeSection === "incidents" && "Incident Case Management"}
-              {activeSection === "detections" && "Detection Engineering & MITRE Rules"}
-              {activeSection === "automation" && "Automation & Response Authorizations"}
-              {activeSection === "integrations" && "Integrations & Data Sources"}
-              {activeSection === "settings" && "Platform Settings & Audit Ledger"}
+            <h1 className="text-sm font-semibold text-zinc-100">
+              {activeSection === "overview" && "Overview"}
+              {activeSection === "investigations" && "Investigations & Triage"}
+              {activeSection === "hunting" && "Threat Hunting"}
+              {activeSection === "incidents" && "Incidents & Cases"}
+              {activeSection === "detections" && "Detection Rules"}
+              {activeSection === "automation" && "Response Approvals"}
+              {activeSection === "integrations" && "Integrations"}
+              {activeSection === "settings" && "Settings & Audit Log"}
             </h1>
           </div>
 
-          <div className="flex items-center gap-2.5">
-            {/* Quick Actions */}
+          <div className="flex items-center gap-2">
             <button
               onClick={handleBatchTriage}
               disabled={triaging}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700/80 text-xs font-medium transition disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 text-xs font-medium transition disabled:opacity-50"
             >
-              <FileSearch className={`w-3.5 h-3.5 text-cyan-400 stroke-[1.75] ${triaging ? "animate-spin" : ""}`} />
+              <FileSearch className={`w-3.5 h-3.5 text-zinc-400 ${triaging ? "animate-spin" : ""}`} />
               <span>{triaging ? "Analyzing..." : "Analyze Detections"}</span>
             </button>
 
             <button
               onClick={handleManualIngest}
               disabled={ingesting}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-black text-xs font-bold shadow-md shadow-cyan-950/40 transition disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-zinc-100 hover:bg-white text-zinc-900 text-xs font-semibold transition disabled:opacity-50"
             >
-              <RefreshCw className={`w-3.5 h-3.5 stroke-[2] ${ingesting ? "animate-spin" : ""}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${ingesting ? "animate-spin" : ""}`} />
               <span>{ingesting ? "Syncing..." : "Sync Telemetry"}</span>
             </button>
           </div>
         </header>
 
-        {/* Warning Banner if scopes missing or Falcon disconnected */}
+        {/* Warning Banner if Falcon disconnected */}
         {hasConfigWarning && (
           <div className="bg-amber-950/40 border-b border-amber-800/60 px-6 py-2.5 flex items-center justify-between text-xs text-amber-200">
             <div className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 stroke-[2]" />
-              <span>CrowdStrike Falcon connection requires attention or API scope verification.</span>
+              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>CrowdStrike Falcon connection requires configuration or API scope verification.</span>
             </div>
             <button
               onClick={() => setIsSettingsOpen(true)}
-              className="flex items-center gap-1.5 underline font-semibold text-amber-300 hover:text-white"
+              className="flex items-center gap-1.5 underline font-medium text-amber-300 hover:text-white"
             >
               <span>Open Diagnostics</span>
               <SlidersHorizontal className="w-3.5 h-3.5" />
@@ -171,13 +170,13 @@ export default function DashboardPage() {
 
           {activeSection === "investigations" && (
             <div className="space-y-4">
-              <div className="p-4 rounded-2xl bg-[#0E1420] border border-slate-800 shadow-md flex items-center justify-between">
+              <div className="p-4 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-between">
                 <div>
-                  <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
-                    AI Investigation & Telemetry Stream
+                  <h2 className="text-sm font-semibold text-zinc-100">
+                    Detections & Investigation Stream
                   </h2>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    Select any detection to inspect process lineage, command execution context, and evidence findings.
+                  <p className="text-xs text-zinc-400 mt-0.5">
+                    Select any detection to inspect telemetry fields, process lineage, and triage findings.
                   </p>
                 </div>
               </div>
@@ -202,82 +201,78 @@ export default function DashboardPage() {
 
           {activeSection === "integrations" && (
             <div className="space-y-4">
-              <div className="p-4 rounded-2xl bg-[#0E1420] border border-slate-800 shadow-md flex items-center justify-between">
+              <div className="p-4 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-between">
                 <div>
-                  <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
+                  <h2 className="text-sm font-semibold text-zinc-100">
                     Integrations & Telemetry Sources
                   </h2>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    Live connection status, permissions, and synchronization freshness across connected platforms.
+                  <p className="text-xs text-zinc-400 mt-0.5">
+                    Connection status and synchronization checkpoints for configured providers.
                   </p>
                 </div>
                 <button
                   onClick={() => setIsSettingsOpen(true)}
-                  className="px-3 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-black text-xs font-bold transition flex items-center gap-1.5"
+                  className="px-3 py-1.5 rounded-md bg-zinc-100 hover:bg-white text-zinc-900 text-xs font-semibold transition flex items-center gap-1.5"
                 >
-                  <SlidersHorizontal className="w-3.5 h-3.5 stroke-[2]" />
+                  <SlidersHorizontal className="w-3.5 h-3.5" />
                   <span>Configure Sources</span>
                 </button>
               </div>
 
-              {/* Status Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-5 rounded-2xl bg-[#0E1420] border border-slate-800 space-y-3">
+                <div className="p-5 rounded-lg bg-zinc-900 border border-zinc-800 space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm text-white">CrowdStrike Falcon US-2 Cloud</span>
+                    <span className="font-semibold text-sm text-zinc-100">CrowdStrike Falcon API</span>
                     <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded font-mono uppercase ${
+                      className={`text-xs font-medium px-2 py-0.5 rounded ${
                         health?.ok
                           ? "bg-emerald-950 text-emerald-400 border border-emerald-800"
                           : "bg-red-950 text-red-400 border border-red-800"
                       }`}
                     >
-                      {health?.ok ? "Live Telemetry Active" : "Disconnected"}
+                      {health?.ok ? `Connected (${health.mode})` : "Disconnected"}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-400 leading-relaxed">
-                    Primary EDR & NG-SIEM telemetry source. Ingests alerts, incidents, host posture, and custom IOCs.
+                  <p className="text-xs text-zinc-400 leading-relaxed">
+                    Primary telemetry source for Alerts v2, Hosts, Custom IOCs, and Real Time Response.
                   </p>
-                  <div className="text-[11px] font-mono text-slate-500 pt-1 border-t border-slate-800">
-                    Endpoint: https://api.us-2.crowdstrike.com
+                  <div className="text-xs font-mono text-zinc-500 pt-2 border-t border-zinc-800">
+                    Checkpoints: {checkpoints.length > 0 ? checkpoints.map((c) => `${c.source}: ${c.last_fetched} fetched`).join(", ") : "No sync recorded"}
                   </div>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-[#0E1420] border border-slate-800 space-y-3">
+                <div className="p-5 rounded-lg bg-zinc-900 border border-zinc-800 space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm text-white">Anthropic Claude AI Triage Engine</span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded font-mono uppercase bg-purple-950 text-purple-300 border border-purple-800">
-                      Tier-3 Reasoning Active
+                    <span className="font-semibold text-sm text-zinc-100">Anthropic Claude Triage</span>
+                    <span className="text-xs font-medium px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 border border-zinc-700">
+                      Investigation Agent
                     </span>
                   </div>
-                  <p className="text-xs text-slate-400 leading-relaxed">
-                    Autonomous investigation agent equipped with read-only CrowdStrike tools for evidence grounding and triage.
+                  <p className="text-xs text-zinc-400 leading-relaxed">
+                    Read-only tool-use investigation loop for alert correlation and evidence summarization.
                   </p>
-                  <div className="text-[11px] font-mono text-slate-500 pt-1 border-t border-slate-800">
-                    Model: claude-3-5-sonnet
-                  </div>
                 </div>
               </div>
             </div>
           )}
 
           {activeSection === "settings" && (
-            <div className="space-y-6">
-              <div className="p-4 rounded-2xl bg-[#0E1420] border border-slate-800 shadow-md flex items-center justify-between">
+            <div className="space-y-5">
+              <div className="p-4 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-between">
                 <div>
-                  <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
-                    System Configuration & Audit
+                  <h2 className="text-sm font-semibold text-zinc-100">
+                    Settings & Audit Log
                   </h2>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    Inspect immutable governance audit logs and manage tenant credentials.
+                  <p className="text-xs text-zinc-400 mt-0.5">
+                    Manage CrowdStrike API credentials and inspect the append-only governance audit trail.
                   </p>
                 </div>
                 <button
                   onClick={() => setIsSettingsOpen(true)}
-                  className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 text-xs font-semibold transition flex items-center gap-1.5"
+                  className="px-3 py-1.5 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 text-xs font-medium transition flex items-center gap-1.5"
                 >
                   <SlidersHorizontal className="w-3.5 h-3.5" />
-                  <span>Open API Credentials & Diagnostics</span>
+                  <span>API Credentials & Diagnostics</span>
                 </button>
               </div>
 

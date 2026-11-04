@@ -100,40 +100,40 @@ export function Sidebar({
   return (
     <aside
       className={`${
-        collapsed ? "w-16" : "w-60"
-      } bg-[#0B101B] border-r border-slate-800/80 flex flex-col justify-between shrink-0 select-none shadow-xl transition-all duration-200`}
+        collapsed ? "w-16" : "w-56"
+      } bg-zinc-900 border-r border-zinc-800 flex flex-col justify-between shrink-0 select-none transition-all duration-200`}
     >
       {/* Brand Header */}
       <div>
-        <div className="p-3.5 border-b border-slate-800/70 flex items-center justify-between">
+        <div className="p-3.5 border-b border-zinc-800 flex items-center justify-between">
           {!collapsed ? (
             <div className="flex items-center justify-between w-full">
-              <span className="font-bold text-base tracking-tight text-white font-sans truncate">
+              <span className="font-semibold text-sm tracking-tight text-zinc-100 font-sans truncate">
                 Vektor
               </span>
               <button
                 onClick={() => setCollapsed(true)}
-                className="p-1 rounded-md text-slate-500 hover:text-slate-200 hover:bg-slate-800 transition"
+                className="p-1 rounded-md text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition"
                 title="Collapse sidebar"
               >
-                <PanelLeftClose className="w-4 h-4 stroke-[1.75]" />
+                <PanelLeftClose className="w-4 h-4" />
               </button>
             </div>
           ) : (
             <div className="w-full flex items-center justify-center">
               <button
                 onClick={() => setCollapsed(false)}
-                className="p-1.5 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition"
                 title="Expand sidebar"
               >
-                <PanelLeftOpen className="w-4 h-4 stroke-[1.75]" />
+                <PanelLeftOpen className="w-4 h-4" />
               </button>
             </div>
           )}
         </div>
 
         {/* Navigation List */}
-        <nav className="p-2 space-y-1">
+        <nav className="p-2 space-y-0.5">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeSection === item.id;
@@ -143,27 +143,25 @@ export function Sidebar({
                 onClick={() => onSelectSection(item.id)}
                 title={collapsed ? item.label : undefined}
                 className={`w-full flex items-center ${
-                  collapsed ? "justify-center px-2 py-2.5" : "justify-between px-3 py-2"
-                } rounded-xl text-left transition-all duration-150 group ${
+                  collapsed ? "justify-center px-2 py-2" : "justify-between px-2.5 py-2"
+                } rounded-md text-left transition group ${
                   isActive
-                    ? "bg-slate-900 border border-cyan-500/40 text-white shadow-sm"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60 border border-transparent"
+                    ? "bg-zinc-800 text-zinc-100"
+                    : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
                 }`}
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div
-                    className={`p-1 rounded-md transition ${
-                      isActive
-                        ? "text-cyan-400"
-                        : "text-slate-500 group-hover:text-slate-300"
+                    className={`transition ${
+                      isActive ? "text-zinc-100" : "text-zinc-500 group-hover:text-zinc-300"
                     }`}
                   >
-                    <Icon className="w-4 h-4 stroke-[1.75]" />
+                    <Icon className="w-4 h-4" />
                   </div>
                   {!collapsed && (
                     <span
-                      className={`text-xs font-medium tracking-tight truncate ${
-                        isActive ? "text-white font-semibold" : "text-slate-300 group-hover:text-white"
+                      className={`text-xs truncate ${
+                        isActive ? "text-zinc-100 font-medium" : "text-zinc-400 group-hover:text-zinc-200"
                       }`}
                     >
                       {item.label}
@@ -173,8 +171,8 @@ export function Sidebar({
 
                 {!collapsed && item.badge !== undefined && (
                   <span
-                    className={`px-1.5 py-0.2 rounded font-mono text-[10px] font-bold ${
-                      item.badgeColor ?? "bg-slate-800 text-slate-300"
+                    className={`px-1.5 py-0.5 rounded font-mono text-[10px] font-medium ${
+                      item.badgeColor ?? "bg-zinc-800 text-zinc-300"
                     }`}
                   >
                     {item.badge}
@@ -187,35 +185,35 @@ export function Sidebar({
       </div>
 
       {/* Bottom Tenant Connection Status */}
-      <div className="p-2.5 border-t border-slate-800/70 bg-[#080C14]">
+      <div className="p-2.5 border-t border-zinc-800 bg-zinc-950">
         {!collapsed ? (
-          <div className="p-2 rounded-lg bg-slate-900/70 border border-slate-800 flex items-center justify-between text-xs">
+          <div className="p-2 rounded-md bg-zinc-900 border border-zinc-800 flex items-center justify-between text-xs">
             <div className="flex items-center gap-2 min-w-0">
               <Radio
-                className={`w-3 h-3 stroke-[2] shrink-0 ${
-                  falconConnected ? "text-emerald-400 animate-pulse" : "text-amber-400"
+                className={`w-3 h-3 shrink-0 ${
+                  falconConnected ? "text-emerald-400" : "text-amber-400"
                 }`}
               />
-              <span className="text-[11px] font-medium text-slate-300 truncate">
+              <span className="text-xs font-medium text-zinc-300 truncate">
                 {falconConnected ? "CrowdStrike Live" : "Offline"}
               </span>
             </div>
 
             <button
               onClick={onOpenSettings}
-              className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition"
+              className="p-1 rounded hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition"
               title="Settings"
             >
-              <SlidersHorizontal className="w-3.5 h-3.5 stroke-[1.75]" />
+              <SlidersHorizontal className="w-3.5 h-3.5" />
             </button>
           </div>
         ) : (
           <button
             onClick={onOpenSettings}
-            className="w-full flex justify-center p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition"
+            className="w-full flex justify-center p-2 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition"
             title="Settings"
           >
-            <SlidersHorizontal className="w-4 h-4 stroke-[1.75]" />
+            <SlidersHorizontal className="w-4 h-4" />
           </button>
         )}
       </div>
